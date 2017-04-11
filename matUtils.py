@@ -27,25 +27,16 @@ def matrixMultiply2(orig,rand):
 def matrixMultDim(orig,rand):
     return orig	
 	
-#dist = sqrt((xa-xb)^2 + ... + (za-zb)^2)
-def euclidean(vec1,vec2):
-	size = range(vec1)
-	dist = 0
-	for i in size:
-	   dist = dist + (vec1[i] - vec2[i]) * (vec1[i] - vec2[i])
-	return np.sqrt(dist)
-	
-	
 def distMatrix(proj):
-    DistProj = np.empty((proj[0], proj[0]))
-    items = len(proj[0])
-    for i in items:
-        for j in items:
-            if i == j:
-                DistProj[i][j] = 0
-            else:
-                DistProj[i][j] = euclidean(proj[i], proj[j])
-     
+    items = len(proj)
+    DistProj = np.empty((items, items))
+    a,b = 0,0
+    for i in proj:
+        b = 0
+        for j in proj:
+          DistProj[a][b] = np.linalg.norm(i-j)
+          b+=1
+        a+=1
     return DistProj
 	
 # normalizada
