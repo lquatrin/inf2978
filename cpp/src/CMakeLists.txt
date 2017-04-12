@@ -20,6 +20,12 @@ configure_file (
 # so that we will find dataprojection.h
 include_directories("${PROJECT_BINARY_DIR}")
 
+file(GLOB SOURCES
+  reader.h
+  reader.cpp
+  dataprojection.cpp
+)
+
 if(USE_MYMATH)
   include_directories ("${PROJECT_SOURCE_DIR}/MathFunctions")
   add_subdirectory (MathFunctions)
@@ -31,7 +37,8 @@ if(USE_MYMATH)
 endif (USE_MYMATH)
 
 # add the executable
-add_executable (DataProjection dataprojection.cpp)
+add_executable (DataProjection ${SOURCES})
+
 target_link_libraries (DataProjection ${EXTRA_LIBS})
 
 # add the install targets
