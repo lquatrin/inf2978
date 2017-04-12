@@ -215,3 +215,11 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 teste.py
+
+cpp/CMakeFiles/
+cpp/*.vcxproj
+cpp/*.filters
+cpp/*.sln
+cpp/CMakeCache.txt
+cpp/cmake_install.cmake
+cpp/dataprojection.h
