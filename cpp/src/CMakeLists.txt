@@ -21,6 +21,8 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 file(GLOB SOURCES
+  distance.h
+  distance.cpp
   reader.h
   reader.cpp
   dataprojection.cpp
