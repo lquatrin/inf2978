@@ -1,8 +1,8 @@
 /**
-*	 Leonardo Quatrin Campagnolo
-*  campagnolo.lq@gmail.com
-*
-*  April 2017
+ *  Leonardo Quatrin Campagnolo
+ *  campagnolo.lq@gmail.com
+ *
+ *  April 2017
 **/
 
 #include "distance.h"

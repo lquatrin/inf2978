@@ -6,4 +6,11 @@
 **/
 
 #pragma once
-double RandomGenGaussianValue (double x, double mean, double standard_deviation);double RandomGenAchiloptasValue (double x);
+
+void InitUniformDistribution();
+
+void ClearUniformDistribution();
+
+double RandomGenGaussianValue (double mean, double standard_deviation);
+
+double RandomGenAchiloptasValue ();

@@ -28,4 +28,29 @@ void ClearUniformDistribution ()
   delete dis;
 }
 
-double RandomGenGaussianValue (double mean, double standard_deviation){  double x = (*dis)((*gen));  double expo = powf((x - mean) / standard_deviation, 2.0);  double f_den = (standard_deviation*sqrt(2.0 *  M_PI));    double ret_val = (1.0 / f_den) * exp(-(1.0 / 2.0) * expo);  return ret_val;}double RandomGenAchiloptasValue (){  double ret_val = 1;  double x = (*dis)((*gen));  if(x < 1.0/6.0)    ret_val = -1;  else if(x < 5.0/6.0)    ret_val = 0;  return ret_val;}
+double RandomGenGaussianValue (double mean, double standard_deviation)
+{
+  double x = (*dis)((*gen));
+
+  double expo = powf((x - mean) / standard_deviation, 2.0);
+
+  double f_den = (standard_deviation*sqrt(2.0 *  M_PI));
+  
+  double ret_val = (1.0 / f_den) * exp(-(1.0 / 2.0) * expo);
+
+  return ret_val;
+}
+
+double RandomGenAchiloptasValue ()
+{
+  double ret_val = 1;
+
+  double x = (*dis)((*gen));
+
+  if(x < 1.0/6.0)
+    ret_val = -1;
+  else if(x < 5.0/6.0)
+    ret_val = 0;
+
+  return ret_val;
+}

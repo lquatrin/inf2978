@@ -25,6 +25,7 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 file(GLOB SOURCES
+  matrix.h
   randomgen.h
   randomgen.cpp
   distance.h

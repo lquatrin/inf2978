@@ -223,4 +223,5 @@ cpp/*.sln
 cpp/CMakeCache.txt
 cpp/cmake_install.cmake
 cpp/dataprojection.h
+cpp/pre_matrix_distance.txt
 *.pkl
