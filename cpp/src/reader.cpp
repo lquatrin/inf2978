@@ -1,3 +1,10 @@
+/**
+ *  Leonardo Quatrin Campagnolo
+ *  campagnolo.lq@gmail.com
+ *
+ *  April 2017
+**/
+
 #include "reader.h"
 
 // Reading vocabulary

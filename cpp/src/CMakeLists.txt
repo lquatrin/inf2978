@@ -5,6 +5,10 @@ project (DataProjection)
 option (USE_MYMATH 
         "Use tutorial provided math implementation" OFF) 
 		
+		# should we use our own math functions?
+option (COMPUTE_TIME 
+        "Use tutorial provided math implementation" ON) 
+		
 # The version number
 set (Tutorial_VERSION_MAJOR 1)
 set (Tutorial_VERSION_MINOR 0)
@@ -21,6 +25,8 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 file(GLOB SOURCES
+  randomgen.h
+  randomgen.cpp
   distance.h
   distance.cpp
   reader.h

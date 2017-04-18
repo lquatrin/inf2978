@@ -3,3 +3,5 @@
 #define Tutorial_VERSION_MINOR @Tutorial_VERSION_MINOR@
 
 #cmakedefine USE_MYMATH
+
+#cmakedefine COMPUTE_TIME
