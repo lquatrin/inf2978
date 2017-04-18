@@ -10,6 +10,8 @@
 
 #include "dataprojection.h"
 
+#include "reader.h"
+
 #ifdef USE_MYMATH
   #include "MathFunctions.h"
 #endif
@@ -33,53 +35,22 @@ int main (int argc, char *argv[])
   // 1 2
   // 1. Baixe o dataset Bag of Words da UCI(arquivo NyTimes).Cerca de 300k docs e vocabulario com 102650 (é 102660) termos
   // 2. Crie uma bag of words para os 3000 primeiros documentos
-
-  std::vector<std::string> vocabulary;
-  std::vector<std::map<uint, uint>> documents;
-
-  // Reading vocabulary
-  //////////////////////////////////////////////////////////////////////
-  std::string line_vocab;
-  std::ifstream vocab_in_file("../vocab.nytimes.txt");
-  while (getline(vocab_in_file, line_vocab))
-    vocabulary.push_back(line_vocab);
-  vocab_in_file.close();
-  //////////////////////////////////////////////////////////////////////
-
-  // Reading Documents
-  //////////////////////////////////////////////////////////////////////
-  std::ifstream documents_in_file("../../docword.nytimes.txt");
-  //std::hash<unsigned int>()
-  for (int i = 0; i < NUMBER_OF_DOCUMENTS; i++)
-    documents.push_back(std::map<uint, uint>());
-
-  // D = Number of Documents
-  // W = Number of words
-  // NNZ = Number of queries
+  std::vector<std::string> vocabulary = ReadingVocabulary("../vocab.nytimes.txt");
   int D, W, NNZ;
-  documents_in_file >> D >> W >> NNZ;
-
-  int doc_id, word_id, count;
-  while (documents_in_file >> doc_id >> word_id >> count)
-  {
-    // Only the first 3000 Documents
-    if (doc_id > NUMBER_OF_DOCUMENTS) break;
-
-    // Correct the indexes of documents and words
-    doc_id = doc_id - 1;
-    word_id = word_id - 1;
-
-    //std::cout << documents[doc_id].size() << std::endl;
-    
-    documents[doc_id][word_id] = count;
-  }
-  documents_in_file.close();
-  //////////////////////////////////////////////////////////////////////
+  std::vector<std::map<uint, uint>> documents = ReadingDocuments("../../docword.nytimes.txt", NUMBER_OF_DOCUMENTS, &D, &W, &NNZ);
 
   // 3
   // 3. Calcule a distancia entre cada par de pontos atraves da forca bruta e messa o tempo computacional deste procedimento.
   //    Armazene estes valores. Utilize dois loops para fazer isso e implemente o calculo da distancia
-  for(int x = 0; x < 3000; x++)  {    distances[x][x] = 0;    for (int y = 0; y < 3000; y++)    {      distances[x][y] = distances[y][x] = 0; //EuclideanDistance    }  }  
+  for(int x = 0; x < 3000; x++)
+  {
+    distances[x][x] = 0;
+    for (int y = 0; y < 3000; y++)
+    {
+      distances[x][y] = distances[y][x] = 0; //EuclideanDistance
+    }
+  }  
+
   // 4
   // 4. Para n = 4, 16, 64, 256, 1024, 4096, 15768, repita o procedimento abaixo 30 vezes
   std::vector<unsigned int> n_cases = { 4, 16, 64, 256, 1024, 4096, 15768 };
