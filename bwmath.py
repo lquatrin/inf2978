@@ -44,7 +44,7 @@ def calculateSampleDistortion(originalVec, projectedVec):
     return abs((np.dot(projectedVec, projectedVec) / np.dot(originalVec, originalVec)) - 1)
 
 
-def maxDistortion(list_of_original_vectors, list_of_projected_vectors):
+def MaxDistortion(list_of_original_vectors, list_of_projected_vectors):
     max_distortion = 0.0
     for original_vector, projected_vector in zip(
             list_of_original_vectors, list_of_projected_vectors):
@@ -54,7 +54,7 @@ def maxDistortion(list_of_original_vectors, list_of_projected_vectors):
     return max_distortion
 
 #probabilidade
-def calculateJLLema(number_of_samples, projected_sample_dimension, delta=0.01):
+def CalculateJLLema(number_of_samples, projected_sample_dimension, delta=0.01):
     return math.sqrt(6.0 * math.log((number_of_samples**2)/delta) / projected_sample_dimension)
 	
 	
