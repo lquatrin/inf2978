@@ -44,13 +44,26 @@ def calculateSampleDistortion(originalVec, projectedVec):
     return abs((np.dot(projectedVec, projectedVec) / np.dot(originalVec, originalVec)) - 1)
 
 
-def MaxDistortion(list_of_original_vectors, list_of_projected_vectors):
+def MaxDistortion(original_distance, projected_distance):
     max_distortion = 0.0
-    for original_vector, projected_vector in zip(
-            list_of_original_vectors, list_of_projected_vectors):
-        curr_distortion = calculateSampleDistortion(original_vector, projected_vector)
-        if curr_distortion > max_distortion:
-            max_distortion = curr_distortion
+    assert(original_distance.shape[0] == projected_distance.shape[0])
+    assert(original_distance.shape[1] == projected_distance.shape[1])
+
+    n_docs = original_distance.shape[0]
+    for x in range(0, n_docs):
+        for y in range(x + 1, n_docs):
+            if original_distance[x][y] != 0.0:
+                curr_distortion = abs( projected_distance[x][y] / original_distance[x][y])
+                if curr_distortion > max_distortion:
+                    max_distortion = curr_distortion
+    #for original_vector, projected_vector in zip(
+    #        list_of_original_vectors, list_of_projected_vectors):
+    #    curr_distortion = calculateSampleDistortion(original_vector, projected_vector)
+    #    if curr_distortion > max_distortion:
+    #        max_distortion = curr_distortion
+    
+
+
     return max_distortion
 
 #probabilidade
