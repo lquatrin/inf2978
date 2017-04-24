@@ -53,7 +53,7 @@ def MaxDistortion(original_distance, projected_distance):
     for x in range(0, n_docs):
         for y in range(x + 1, n_docs):
             if original_distance[x][y] != 0.0:
-                curr_distortion = projected_distance[x][y] / original_distance[x][y]
+                curr_distortion = projected_distance[x][y]**2 / original_distance[x][y]**2
                 if curr_distortion > max_distortion:
                     max_distortion = curr_distortion
     #for original_vector, projected_vector in zip(
