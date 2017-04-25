@@ -32,7 +32,7 @@ def RunSVD(documents, mtx_original_distance, n_cases, repeat, n_words, number_of
   S = np.diag(s)
 
   aX = scipy.sparse.csc_matrix(a)
-  print(min(aX.shape))
+  #print(min(aX.shape))
     
   
   #'LM' : largest singular values
@@ -49,15 +49,13 @@ def RunSVD(documents, mtx_original_distance, n_cases, repeat, n_words, number_of
   #print(U.shape, V.shape, s.shape)
   #S = np.diag(s)
 
-  print(sU.shape, sS.shape, sV.shape)
-
   print("MATRIZ ORIGINAL")
   print(a)
 
-  print("SVD")
+  print("SVD", U.shape, S.shape, V.shape)
   print(np.dot(U, np.dot(S, V)))
 
-  print("SVD sparse")
+  print("SVD sparse", sU.shape, sS.shape, sV.shape)
   print(np.dot(sU, np.dot(sS, sV)))
   
   #X = np.random.uniform(size = [40, 20])
