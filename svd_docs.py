@@ -63,7 +63,7 @@ n_cases = [ 4, 16, 64, 256, 1024, 4096, 15768 ]
 for N in n_cases:
   s_clock = time.clock()
   #svd for the documents 
-  U_r,d_r,V_r = linalg.svds(r_mat)
+  U_r,d_r,V_r = linalg.svds(r_mat,k=N)
   f_clock = time.clock()
   timers[1] += (f_clock - s_clock)
   
