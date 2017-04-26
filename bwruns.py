@@ -46,60 +46,77 @@ def RunVersion01(documents, mtx_original_distance, n_cases, repeat, d, number_of
     #   4. matriz random proj
     #   5. projeção random proj
     #   6. tempo para obter novas distâncias
-    v1_timers = np.zeros(shape = (6))
-    v1_distortions = np.zeros(shape = (2, 3)) # mean, min, max
-    # Set initial Min Max Distortions
-    for x in range(2):
-      v1_distortions[x][1] = float('inf')
-      v1_distortions[x][2] = -float('inf')
+    
 
     if do_achiloptas == True:
       print("  . Achiloptas")
+
+      v_timers = np.zeros(shape = (3))
+      global_mean_distortion = 0.0
+      global_min_distortion = float('inf')
+      global_max_distortion = -float('inf')
+      
+      text_file = open(path + str(N) + "_v1_achiloptas.txt", "w")
+      text_file.write("%s\t%s\t%s\t%s\t%s\n" % ('case', 'gen_time', 'proj_time', 'dist_time', 'distortion'))
+      
       for ith_repeat in range(repeat):
         ret_data = acl.Achlioptas(number_of_documents, documents, mtx_original_distance, d, n)
         
-        v1_timers[0] += ret_data['gen_time']
-        v1_timers[1] += ret_data['proj_time']
-        v1_timers[2] += ret_data['dist_time']
+        v_timers[0] += ret_data['gen_time']
+        v_timers[1] += ret_data['proj_time']
+        v_timers[2] += ret_data['dist_time']
 
         max_distortion = ret_data['distortion']
 
-        v1_distortions[0][0] += max_distortion
-        v1_distortions[0][1] = min(max_distortion, v1_distortions[0][1])
-        v1_distortions[0][2] = max(max_distortion, v1_distortions[0][2])
+        text_file.write("%d\t%f\t%f\t%f\t%f\n" % (ith_repeat + 1, ret_data['gen_time'], ret_data['proj_time'], ret_data['dist_time'], ret_data['distortion']))
+
+        global_mean_distortion += max_distortion
+        global_min_distortion = min(max_distortion, global_min_distortion)
+        global_max_distortion = max(max_distortion, global_max_distortion)
 
       # compute results
-      text_file = open(path + str(N) + "_v1_achiloptas.txt", "w")
+      text_file.write("%d\n" % (repeat))   
       for x in range(0, 3):
-        v1_timers[x] = v1_timers[x] / (float(repeat))
-      text_file.write("%f\n%f\n%f\n" % (v1_timers[0], v1_timers[1], v1_timers[2]))
-      v1_distortions[0][0] = v1_distortions[0][0] / float(repeat)
-      text_file.write("%f\t%f\t%f" % (v1_distortions[0][0], v1_distortions[0][1], v1_distortions[0][2]))
+        v_timers[x] = v_timers[x] / (float(repeat))
+      text_file.write("%f\n%f\n%f\n" % (v_timers[0], v_timers[1], v_timers[2]))
+      
+      global_mean_distortion = global_mean_distortion / float(repeat)
+      text_file.write("%f\t%f\t%f" % (global_mean_distortion, global_min_distortion, global_max_distortion))
       text_file.close()    
 
     if do_randomproj == True:
       print("  . Random Projections")
+
+      v_timers = np.zeros(shape = (3))
+      global_mean_distortion = 0.0
+      global_min_distortion = float('inf')
+      global_max_distortion = -float('inf')
+      
+      text_file = open(path + str(N) + "_v1_randomproj.txt", "w")
+      text_file.write("%s\t%s\t%s\t%s\t%s\n" % ('case', 'gen_time', 'proj_time', 'dist_time', 'distortion'))
+      
       for ith_repeat in range(repeat):
         ret_data = lrp.RandomProjection(number_of_documents, documents, mtx_original_distance, d, n)
 
-        v1_timers[3] += ret_data['gen_time']
-        v1_timers[4] += ret_data['proj_time']
-        v1_timers[5] += ret_data['dist_time']
+        v_timers[0] += ret_data['gen_time']
+        v_timers[1] += ret_data['proj_time']
+        v_timers[2] += ret_data['dist_time']
 
         max_distortion = ret_data['distortion']
 
-        v1_distortions[1][0] += max_distortion
-        v1_distortions[1][1] = min(max_distortion, v1_distortions[1][1])
-        v1_distortions[1][2] = max(max_distortion, v1_distortions[1][2])
+        text_file.write("%d\t%f\t%f\t%f\t%f\n" % (ith_repeat + 1, ret_data['gen_time'], ret_data['proj_time'], ret_data['dist_time'], ret_data['distortion']))
+
+        global_mean_distortion += max_distortion
+        global_min_distortion = min(max_distortion, global_min_distortion)
+        global_max_distortion = max(max_distortion, global_max_distortion)
 
       # compute results
-      text_file = open(path + str(N) + "_v1_randomproj.txt", "w")
-      for x in range(3, 6):
-        v1_timers[x] = v1_timers[x] / (float(repeat))
-      text_file.write("%f\n%f\n%f\n" % (v1_timers[3], v1_timers[4], v1_timers[5]))
+      for x in range(0, 3):
+        v_timers[x] = v_timers[x] / (float(repeat))
+      text_file.write("%f\n%f\n%f\n" % (v_timers[0], v_timers[1], v_timers[2]))
 
-      v1_distortions[1][0] = v1_distortions[1][0] / float(repeat)
-      text_file.write("%f\t%f\t%f" % (v1_distortions[1][0], v1_distortions[1][1], v1_distortions[1][2]))
+      global_mean_distortion = global_mean_distortion / float(repeat)
+      text_file.write("%f\t%f\t%f" % (global_mean_distortion, global_min_distortion, global_max_distortion))
       text_file.close()
       
       # 4.6
@@ -123,58 +140,73 @@ def RunVersion02(documents, mtx_original_distance, n_cases, repeat, d, number_of
     ########################################
     #   3. matriz e projeção random proj
     #   4. tempo para obter novas distâncias
-    v2_timers = np.zeros(shape = (4))
-    v2_distortions = np.zeros(shape = (2, 3)) # mean, min, max
-    # Set initial Min Max Distortions
-    for x in range(2):
-      v2_distortions[x][1] = float('inf')
-      v2_distortions[x][2] = -float('inf')
 
     if do_achiloptas == True:
       print("  . Achiloptas")
+
+      v_timers = np.zeros(shape = (2))
+      global_mean_distortion = 0.0
+      global_min_distortion = float('inf')
+      global_max_distortion = -float('inf')
+
+      text_file = open(path + str(N) + "_v2_achiloptas.txt", "w")
+      text_file.write("%s\t%s\t%s\t%s\n" % ('case', 'gen_proj_time', 'dist_time', 'distortion'))
+      
       for ith_repeat in range(repeat):
         ret_data = acl.Achlioptas(number_of_documents, documents, mtx_original_distance, d, n, use_less_memory = True)
         
-        v2_timers[0] += ret_data['gen_proj_time']
-        v2_timers[1] += ret_data['dist_time']
+        v_timers[0] += ret_data['gen_proj_time']
+        v_timers[1] += ret_data['dist_time']
 
         max_distortion = ret_data['distortion']
 
-        v2_distortions[0][0] += max_distortion
-        v2_distortions[0][1] = min(max_distortion, v2_distortions[0][1])
-        v2_distortions[0][2] = max(max_distortion, v2_distortions[0][2])
+        text_file.write("%d\t%f\t%f\t%f\n" % (ith_repeat + 1, ret_data['gen_proj_time'], ret_data['dist_time'], ret_data['distortion']))
+
+        global_mean_distortion += max_distortion
+        global_min_distortion = min(max_distortion, global_min_distortion)
+        global_max_distortion = max(max_distortion, global_max_distortion)
 
       # compute results
-      text_file = open(path + str(N) + "_v2_achiloptas.txt", "w")
       for x in range(0, 2):
-        v2_timers[x] = v2_timers[x] / (float(repeat))
-      text_file.write("%f\n%f\n" % (v2_timers[0], v2_timers[1]))
-      v2_distortions[0][0] = v2_distortions[0][0] / float(repeat)
-      text_file.write("%f\t%f\t%f" % (v2_distortions[0][0], v2_distortions[0][1], v2_distortions[0][2]))
+        v_timers[x] = v_timers[x] / (float(repeat))
+      text_file.write("%f\n%f\n" % (v_timers[0], v_timers[1]))
+      
+      global_mean_distortion = global_mean_distortion / float(repeat)
+      text_file.write("%f\t%f\t%f" % (global_mean_distortion, global_min_distortion, global_max_distortion))
       text_file.close()
 
     if do_randomproj == True:
       print("  . Random Projections")
+
+      v_timers = np.zeros(shape = (2))
+      global_mean_distortion = 0.0
+      global_min_distortion = float('inf')
+      global_max_distortion = -float('inf')
+
+      text_file = open(path + str(N) + "_v2_randomproj.txt", "w")
+      text_file.write("%s\t%s\t%s\t%s\n" % ('case', 'gen_proj_time', 'dist_time', 'distortion'))
+      
       for ith_repeat in range(repeat):
         ret_data = lrp.RandomProjection(number_of_documents, documents, mtx_original_distance, d, n, use_less_memory = True)
         
-        v2_timers[2] += ret_data['gen_proj_time']
-        v2_timers[3] += ret_data['dist_time']
+        v_timers[0] += ret_data['gen_proj_time']
+        v_timers[1] += ret_data['dist_time']
 
         max_distortion = ret_data['distortion']
+
+        text_file.write("%d\t%f\t%f\t%f\n" % (ith_repeat + 1, ret_data['gen_proj_time'], ret_data['dist_time'], ret_data['distortion']))
         
-        v2_distortions[1][0] += max_distortion
-        v2_distortions[1][1] = min(max_distortion, v2_distortions[1][1])
-        v2_distortions[1][2] = max(max_distortion, v2_distortions[1][2])
+        global_mean_distortion += max_distortion
+        global_min_distortion = min(max_distortion, global_min_distortion)
+        global_max_distortion = max(max_distortion, global_max_distortion)
 
       # compute results
-      text_file = open(path + str(N) + "_v2_randomproj.txt", "w")
-      for x in range(2, 4):
-        v2_timers[x] = v2_timers[x] / (float(repeat))
-      text_file.write("%f\n%f\n" % (v2_timers[2], v2_timers[3]))
+      for x in range(0, 2):
+        v_timers[x] = v_timers[x] / (float(repeat))
+      text_file.write("%f\n%f\n" % (v_timers[0], v_timers[1]))
 
-      v2_distortions[1][0] = v2_distortions[1][0] / float(repeat)
-      text_file.write("%f\t%f\t%f" % (v2_distortions[1][0], v2_distortions[1][1], v2_distortions[1][2]))
+      global_mean_distortion = global_mean_distortion / float(repeat)
+      text_file.write("%f\t%f\t%f" % (global_mean_distortion, global_min_distortion, global_max_distortion))
       text_file.close()
       
       # 4.6

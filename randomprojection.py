@@ -44,7 +44,7 @@ def RandomProjectionV2 (data_size, origin_data, origin_distance_matrix, origin_d
   s_clock = time.clock()
   projected_documents = bwprojection.GenerateAndProjectDocumentsRandomGeneration(origin_data, projected_dimension, data_size, origin_dimension)
   f_clock = time.clock()
-  data_gen_proj_time += (f_clock - s_clock)
+  data_gen_proj_time = (f_clock - s_clock)
 
   # 4.4
   projected_distance_matrix, mtx_proj_dist_time = bwdistance.DoEuclidianDistanceProjDocs(projected_documents)
