@@ -117,12 +117,6 @@ def RunVersion01(documents, mtx_original_distance, N, repeat, d, number_of_docum
     # compute results
     ReportV1Results(text_file, repeat, v_timers, global_mean_distortion, global_min_distortion, global_max_distortion)
     text_file.close()
-    
-    # 4.6
-    text_file = open(path + str(N) + "_v1_JL.txt", "w")
-    text_file.write("%f" % (bwmath.CalculateJLLema(d, n)))
-    text_file.close()
-
 
 def ReportV2Results(text_file, repeat, v_timers, global_mean_distortion, global_min_distortion, global_max_distortion):
   text_file.write("%d\n" % (repeat)) 
@@ -207,8 +201,3 @@ def RunVersion02(documents, mtx_original_distance, N, repeat, d, number_of_docum
     # compute results
     ReportV2Results(text_file, repeat, v_timers, global_mean_distortion, global_min_distortion, global_max_distortion)  
     text_file.close()
-      
-    # 4.6
-    text_file = open(path + str(N) + "_v2_JL.txt", "w")
-    text_file.write("%f" % (bwmath.CalculateJLLema(d, n)))
-    text_file.close()   
