@@ -20,7 +20,7 @@ import gc
 import bwruns
 
 
-DOCWORD_FILE = "./docword.nytimes.txt"
+DOCWORD_FILE = "../docword.nytimes.txt"
 VOCAB_FILE = "vocab.nytimes.txt"
 
 # 1 2
@@ -57,8 +57,7 @@ mtx_original_distance = bwdistance.GenerateOriginalDistanceMatrix(D_t_work, W, d
 f_clock = time.clock()
 timers[0] += (f_clock - s_clock)
 
-repeat = 30
-n_cases = [ 4, 16, 64, 256, 1024, 4096, 15768 ]
+n_cases = [ 4]#, 16, 64, 256 ]
 
 for N in n_cases:
   s_clock = time.clock()
@@ -69,34 +68,35 @@ for N in n_cases:
   
   s_clock = time.clock()
   
-  for ith_repeat in range(repeat):
-    dim = N
+  dim = N
     
-    U_r_k = U_r[:,:dim]
-    d_r_k = d_r[:dim]
-    V_r_k = V_r[:dim,:]
-     
-    projection = np.matrix(U_r_k) * np.diag(d_r_k) * np.matrix(V_r_k)
+  U_r_k = U_r[:,:dim]
+  d_r_k = d_r[:dim]
+  V_r_k = V_r[:dim,:]
+
+  # https://stats.stackexchange.com/questions/107533/how-to-use-svd-for-dimensionality-reduction-to-reduce-the-number-of-columns-fea
+  projection = np.dot(U_r_k, np.diag(d_r_k))
+  #projection = np.dot(projection, V_r_k)
     
-    f_clock = time.clock()
+  f_clock = time.clock()
     
-    timers[2] += (f_clock - s_clock)
+  timers[2] += (f_clock - s_clock)
     
-    s_clock = time.clock()
-    
-    #TO DO - Ta estourando a distancia 
-    projected_distances= sp.distance.pdist(projection.T, metric='euclidean')
-    #Proj_DistanceMatrix, s_time = bwdistance.DoEuclidianDistanceProjDocs(projection)
-    
-    f_clock = time.clock()
-    timers[3] += (f_clock - s_clock)
-    
-    max_distortion = bwmath.MaxDistortion(mtx_original_distance, projected_distances)
+  s_clock = time.clock()
+
+  #TO DO - Ta estourando a distancia 
+  #projected_distances = sp.distance.pdist(projection.T, metric='euclidean')
+  projected_distances, s_time = bwdistance.DoEuclidianDistanceProjDocs(projection.T)
   
-  text_file = open(path + str(N) + "svd.txt", "w")
-  for x in range(2, 4):
-    timers[x] = timers[x] / (float(repeat))
-  text_file.write("%f\n%f\n" % (timers[2], timers[3]))
+  f_clock = time.clock()
+  timers[3] += (f_clock - s_clock)
+
+  max_distortion = bwmath.MaxDistortion(mtx_original_distance, projected_distances)
+  #print("Distorsão:", max_distortion)
+  
+  text_file = open(str(N) + "svd.txt", "w")
+  text_file.write("%f\n%f\n" % (timers[0], timers[1]))
+  text_file.write("%f\n" % (max_distortion))
   text_file.close()
 
   
