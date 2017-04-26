@@ -14,6 +14,7 @@ import os
 import gc
 
 import randomprojection as lrp
+import achlioptas as acl
 
 # 4.1. Obtenha uma matriz aleatoria de n linhas e d colunas pelo metodo de Achiloptas e pelo metodo dado em aula, onde d e o tamanho do vocaulario.
 # 4.2. Messa o tempo computacional da geracao das matrizes
@@ -55,28 +56,14 @@ def RunVersion01(documents, mtx_original_distance, n_cases, repeat, d, number_of
     if do_achiloptas == True:
       print("  . Achiloptas")
       for ith_repeat in range(repeat):
-        projected_documents = None
-        Proj_DistanceMatrix = None
-        projection_matrix = None
+        ret_data = acl.Achlioptas(number_of_documents, documents, mtx_original_distance, d, n)
+        
+        v1_timers[0] += ret_data['gen_time']
+        v1_timers[1] += ret_data['proj_time']
+        v1_timers[2] += ret_data['dist_time']
 
-        # Achiloptas
-        # 4.1 4.2
-        projection_matrix, s_time = bwnumbergen.GenerateRandomAchiloptasMatrix(n,d)
-        v1_timers[0] += s_time
+        max_distortion = ret_data['distortion']
 
-        # 4.3
-        s_clock = time.clock()
-        projected_documents = bwprojection.ProjectDocuments(documents, projection_matrix, n, number_of_documents)
-        projected_documents = projected_documents * math.sqrt(3/n)
-        f_clock = time.clock()
-        v1_timers[1] += (f_clock - s_clock)
-
-        # 4.4
-        Proj_DistanceMatrix, s_time = bwdistance.DoEuclidianDistanceProjDocs(projected_documents)
-        v1_timers[2] += s_time
-
-        # 4.5
-        max_distortion = bwmath.MaxDistortion(mtx_original_distance, Proj_DistanceMatrix)
         v1_distortions[0][0] += max_distortion
         v1_distortions[0][1] = min(max_distortion, v1_distortions[0][1])
         v1_distortions[0][2] = max(max_distortion, v1_distortions[0][2])
@@ -146,23 +133,13 @@ def RunVersion02(documents, mtx_original_distance, n_cases, repeat, d, number_of
     if do_achiloptas == True:
       print("  . Achiloptas")
       for ith_repeat in range(repeat):
-        projected_documents = None
-        Proj_DistanceMatrix = None
+        ret_data = acl.Achlioptas(number_of_documents, documents, mtx_original_distance, d, n, use_less_memory = True)
+        
+        v2_timers[0] += ret_data['gen_proj_time']
+        v2_timers[1] += ret_data['dist_time']
 
-        # Achiloptas
-        # 4.1 4.2 4.3
-        s_clock = time.clock()
-        projected_documents = bwprojection.GenerateAndProjectDocumentsAchiloptas(documents, n, number_of_documents, d)
-        projected_documents = projected_documents * math.sqrt(3/n)
-        f_clock = time.clock()
-        v2_timers[0] += (f_clock - s_clock)
+        max_distortion = ret_data['distortion']
 
-        # 4.4
-        Proj_DistanceMatrix, s_time = bwdistance.DoEuclidianDistanceProjDocs(projected_documents)
-        v2_timers[1] += s_time
-
-        # 4.5
-        max_distortion = bwmath.MaxDistortion(mtx_original_distance, Proj_DistanceMatrix)
         v2_distortions[0][0] += max_distortion
         v2_distortions[0][1] = min(max_distortion, v2_distortions[0][1])
         v2_distortions[0][2] = max(max_distortion, v2_distortions[0][2])
