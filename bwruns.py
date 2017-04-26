@@ -13,6 +13,8 @@ import numpy as np
 import os
 import gc
 
+import randomprojection as lrp
+
 # 4.1. Obtenha uma matriz aleatoria de n linhas e d colunas pelo metodo de Achiloptas e pelo metodo dado em aula, onde d e o tamanho do vocaulario.
 # 4.2. Messa o tempo computacional da geracao das matrizes
 # 4.3. Projete os 3000 documentos no espaco Rn atraves das matrizes geradas. Messa o tempo da projecao
@@ -91,27 +93,14 @@ def RunVersion01(documents, mtx_original_distance, n_cases, repeat, d, number_of
     if do_randomproj == True:
       print("  . Random Projections")
       for ith_repeat in range(repeat):
-        projected_documents = None
-        Proj_DistanceMatrix = None
-        projection_matrix = None
-        
-        # Random projections with gaussian
-        # 4.1 4.2
-        projection_matrix, s_time = bwnumbergen.GenerateRandomGaussianMatrix(n,d)
-        v1_timers[3] += s_time
+        ret_data = lrp.RandomProjection(number_of_documents, documents, mtx_original_distance, d, n)
 
-        # 4.3
-        s_clock = time.clock()
-        projected_documents = bwprojection.ProjectDocuments(documents, projection_matrix, n, number_of_documents)
-        f_clock = time.clock()
-        v1_timers[4] += (f_clock - s_clock)
+        v1_timers[3] += ret_data['gen_time']
+        v1_timers[4] += ret_data['proj_time']
+        v1_timers[5] += ret_data['dist_time']
 
-        # 4.4
-        Proj_DistanceMatrix, s_time = bwdistance.DoEuclidianDistanceProjDocs(projected_documents)
-        v1_timers[5] += s_time
-        
-        # 4.5
-        max_distortion = bwmath.MaxDistortion(mtx_original_distance, Proj_DistanceMatrix)
+        max_distortion = ret_data['distortion']
+
         v1_distortions[1][0] += max_distortion
         v1_distortions[1][1] = min(max_distortion, v1_distortions[1][1])
         v1_distortions[1][2] = max(max_distortion, v1_distortions[1][2])
@@ -190,22 +179,13 @@ def RunVersion02(documents, mtx_original_distance, n_cases, repeat, d, number_of
     if do_randomproj == True:
       print("  . Random Projections")
       for ith_repeat in range(repeat):
-        projected_documents = None
-        Proj_DistanceMatrix = None
+        ret_data = lrp.RandomProjection(number_of_documents, documents, mtx_original_distance, d, n, use_less_memory = True)
         
-        # Random projections with gaussian
-        # 4.1 4.2 4.3
-        s_clock = time.clock()
-        projected_documents = bwprojection.GenerateAndProjectDocumentsRandomGeneration(documents, n, number_of_documents, d)
-        f_clock = time.clock()
-        v2_timers[2] += (f_clock - s_clock)
+        v2_timers[2] += ret_data['gen_proj_time']
+        v2_timers[3] += ret_data['dist_time']
 
-        # 4.4
-        Proj_DistanceMatrix, s_time = bwdistance.DoEuclidianDistanceProjDocs(projected_documents)
-        v2_timers[3] += s_time
+        max_distortion = ret_data['distortion']
         
-        # 4.5
-        max_distortion = bwmath.MaxDistortion(mtx_original_distance, Proj_DistanceMatrix)
         v2_distortions[1][0] += max_distortion
         v2_distortions[1][1] = min(max_distortion, v2_distortions[1][1])
         v2_distortions[1][2] = max(max_distortion, v2_distortions[1][2])
