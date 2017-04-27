@@ -25,25 +25,23 @@ def SVDDocsProjection (data_doc, mtx_original_distance, N, d, number_of_document
 
   # Call SVD for sparse matrices
   s_clock = time.clock()
-  U, s_autoval, Vt = linalg.svds(data_doc, k = N, which = 'LM')
+  U, S, Vt = linalg.svds(data_doc, k = N, which = 'LM')
   f_clock = time.clock()
   svd_time = (f_clock - s_clock)
 
   s_clock = time.clock()
   # Correct diagonal
-  # linalg.svds returns eigenvalues on Ascending Order
-  diagshape = s_autoval.shape[0]
-  s = np.zeros(shape = (diagshape))
-  for i in range(diagshape):
-    s[i] = s_autoval[diagshape - 1 - i]
-  #print(s)
+  # linalg.svds returns eigenvalues on Ascending Order    
+  S = np.diag(S)
   
   # https://stats.stackexchange.com/questions/107533/how-to-use-svd-for-dimensionality-reduction-to-reduce-the-number-of-columns-fea
   # Matrix V is used only to map the data from this reduced n-dimensional
   #   space to your original d-dimensional space. If you don't need to map
   #   it back, just leave V out, and done you are.
-  projection = np.dot(U, np.diag(s))
+  # We will not correct the colunm content, because the distance value will be the same.
+  projection = np.dot(U, S)
   #projection = np.dot(projection, Vt)
+
   f_clock = time.clock()
   proj_time = (f_clock - s_clock)
 
@@ -54,6 +52,7 @@ def SVDDocsProjection (data_doc, mtx_original_distance, N, d, number_of_document
   dist_time = (f_clock - s_clock)
   
   max_distortion = bwmath.MaxDistortion(mtx_original_distance, projected_distances)
+  print(max_distortion)
 
   text_file.write("%f\t%f\t%f\t%f\n" % (svd_time, proj_time, dist_time, max_distortion))
 

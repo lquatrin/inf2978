@@ -14,7 +14,7 @@ K = 4
 #X = scipy.sparse.csc_matrix(mtx_documents)
 #U, S, Vt = svds(X, 10, which = 'LM')
 
-m_size = 6
+m_size = 5
 a = np.zeros(shape = (m_size, m_size))
 for i in range(m_size):
   for j in range(m_size):
@@ -35,7 +35,8 @@ diagshape = ss.shape[0]
 sS = np.zeros(shape = (diagshape))
 for i in range(diagshape):
   sS[i] = ss[diagshape - 1 - i]
-sS = np.diag(sS)
+revS = np.diag(sS)
+sS = np.diag(ss)
 
 #print(U.shape, V.shape, s.shape)
 #S = np.zeros((9, 6), dtype = complex)
@@ -54,7 +55,17 @@ print(np.dot(U, np.dot(S, V)))
 print("SVD sparse", sU.shape, sS.shape, sV.shape)
 print(np.dot(sU, np.dot(sS, sV)))
 
-print(sS)
+revU = np.zeros(shape = sU.shape)
+cols = sU.shape[1]
+for row in range(sU.shape[0]):
+  for c in range(sU.shape[1]):
+    revU[row][cols - c - 1] = sU[row][c]
+
+revV = np.zeros(shape = sV.shape)
+rows = sV.shape[0]
+for col in range(sV.shape[1]):
+  for rw in range(sV.shape[0]):
+    revV[rows - 1 - rw][col] = sV[rw][col]
   
 #X = np.random.uniform(size = [40, 20])
 #X = scipy.sparse.csc_matrix(X)
