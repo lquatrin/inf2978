@@ -1,0 +1,131 @@
+import numpy as np
+import pandas as pd
+import scipy
+import scipy.sparse as sp
+import scipy.sparse.linalg
+from scipy.sparse import *
+from scipy.sparse.linalg import norm
+import random
+from scipy import linalg
+import timeit
+import matplotlib.pyplot as plt
+from PIL import Image
+
+
+"""Function computes the CUR decomposition of matrix A, sampling numr rows and numc columns. A is of size nrows X ncols."""
+def CUR(mat,numr,numc,nrows,ncols):
+	A_T = np.transpose(mat)
+	A = sp.csr_matrix(mat)
+	A_T = sp.csr_matrix(A_T)
+	rows = np.zeros(nrows, dtype=float)
+	r = []
+	rowsprob = np.zeros(nrows, dtype=float)
+	total = 0
+	tempr = sp.coo_matrix(A)
+	#calculating the probability of each row being selected
+	for i,j,v in zip(tempr.row, tempr.col, tempr.data):
+		rowsprob[i] = rowsprob[i] + v*v
+		total = total + v*v
+
+	rowsprob = rowsprob/total
+	#calculating the cumulative probabilities
+	cumrowsprob = np.zeros(nrows, dtype=float)
+	cumrowsprob[0] = rowsprob[0]
+	for i in range(1,rowsprob.size):
+		cumrowsprob[i] = cumrowsprob[i-1] + rowsprob[i]
+		
+	#generating random rows and building r matrix
+	for i in range(0,numr):
+		rand = random.random()
+		entry = np.searchsorted(cumrowsprob,rand)
+		rows[entry] = rows[entry] + 1	
+
+	#handling duplicates by multiplying duplicate rows with square root of number of duplications and removing duplicates 
+	selectedrows = []
+	rows = np.sqrt(rows)
+	for i in range(0,nrows):
+		if rows[i]>0:
+			r.append((A[i].toarray()/((numr*rowsprob[i])**0.5))*rows[i])
+			selectedrows.append(i)
+
+	cols = np.zeros(ncols, dtype=float)
+	c = []
+	colsprob = np.zeros(ncols, dtype=float)
+	total = 0
+	tempc = sp.coo_matrix(A_T)
+	#calculating the probability of each column being selected
+	for i,j,v in zip(tempc.row, tempc.col, tempc.data):
+		colsprob[i] = colsprob[i] + v*v
+		total = total + v*v
+
+	colsprob = colsprob/total
+	#calculating the cumulative probabilities
+	cumcolsprob = np.zeros(ncols, dtype=float)
+	cumcolsprob[0] = colsprob[0]
+	for i in range(1,colsprob.size):
+		cumcolsprob[i] = cumcolsprob[i-1] + colsprob[i]
+		
+	#generating random cols and building r matrix
+	for i in range(0,numc):
+		rand = random.random()
+		entry = np.searchsorted(cumcolsprob,rand)
+		cols[entry] = cols[entry] + 1	
+
+	#handling duplicates by multiplying duplicate columns with square root of number of duplications and removing duplicates
+	selectedcols = []
+	cols = np.sqrt(cols)
+	for i in range(0,ncols):
+		if cols[i]>0:
+			c.append((A_T[i].toarray()/((numc*colsprob[i])**0.5))*cols[i])
+			selectedcols.append(i)
+
+	c = np.vstack(c)
+	r = np.vstack(r)
+	#finding the intersection of c and r = w
+	w = np.zeros(shape=(len(selectedrows),len(selectedcols)))
+	for i in range(0,len(selectedrows)):
+		for j in range(0,len(selectedcols)):
+			w[i][j] = mat[selectedrows[i]][selectedcols[j]]
+
+	c = sp.csr_matrix(c)
+	c = c.transpose()
+	r = sp.csr_matrix(r)
+
+	#computing the SVD decomposition of the w matrix
+	x,z,y_T = linalg.svd(w)
+	z = linalg.diagsvd(z, x.shape[1], y_T.shape[0])
+	y = np.transpose(y_T)
+
+	#computing the u matrix
+	zplus = linalg.pinv(np.matrix(z))
+	zplussquare = zplus*zplus
+	u = np.matmul(y,np.matmul(zplussquare,np.transpose(x)))
+
+	#computing the reconstructed matrix and error
+	reconstructedmatrix = c*(u*r)
+	errormatrix = sp.csr_matrix(A-reconstructedmatrix)
+	reconstructionerror = norm(errormatrix)
+	return reconstructedmatrix
+
+    
+def generate(image_red,image_green,image_blue,dimension,original_bytes,row,col):
+
+  cases = [1,2,5,10]
+  
+  for n in cases:
+    dim = int(dimension * n)
+   
+    reconR = CUR(image_red,dim,dim,row,col)
+    reconG = CUR(image_green,dim,dim,row,col)
+    reconB = CUR(image_blue,dim,dim,row,col)
+ 
+    image_recon = np.zeros((row,col,3))   
+    image_recon[:,:,0] = reconR/255
+    image_recon[:,:,1] = reconG/255
+    image_recon[:,:,2] = reconB/255
+    
+    image_recon[image_recon < 0] = 0
+    image_recon[image_recon > 1] = 1
+
+    result = Image.fromarray((image_recon*255).astype(np.uint8))
+    result.save('lena_cur_'+str(n)+'.jpg')
