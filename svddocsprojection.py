@@ -13,10 +13,25 @@ from scipy import spatial as sp
 
 import scipy
 import numpy as np
+from scipy.spatial.distance import pdist
 
 import os
 import gc
 
+def MaxDistortionForSVD(original_distance, projected_distance):
+    max_distortion = 0.0
+
+    n_docs = original_distance.shape[0]
+    index = 0
+    for x in range(0, n_docs):
+        for y in range(x + 1, n_docs):
+            if original_distance[x][y] != 0.0:
+                curr_distortion = abs((projected_distance[index] / original_distance[x][y]) - 1.0)
+                if curr_distortion > max_distortion:
+                    max_distortion = curr_distortion
+            index = index + 1
+    return max_distortion
+                    
 def SVDDocsProjection (documents, mtx_original_distance, N, d, number_of_documents, path):
   # Create DataDocs
   data_doc = np.zeros(shape = (number_of_documents, d))
@@ -58,12 +73,13 @@ def SVDDocsProjection (documents, mtx_original_distance, N, d, number_of_documen
   print("Euclidean Distance")
   s_clock = time.clock()
   #projected_distances = sp.distance.pdist(data_doc.T, metric='euclidean')
-  projected_distances, s_time = bwdistance.DoEuclidianDistanceProjDocs(data_doc.T)
+  #projected_distances, s_time = bwdistance.DoEuclidianDistanceProjDocs(data_doc.T)
+  projected_distances = pdist(data_doc, 'sqeuclidean')
   f_clock = time.clock()
   dist_time = (f_clock - s_clock)
 
   print("Distortion")
-  max_distortion = bwmath.MaxDistortion(mtx_original_distance, projected_distances)
+  max_distortion = MaxDistortionForSVD(mtx_original_distance, projected_distances)
   print(max_distortion)
 
   text_file = open(path + str(N) + "_svd_docs.txt", "w")

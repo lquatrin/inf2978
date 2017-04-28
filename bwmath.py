@@ -44,7 +44,7 @@ def calculateSampleDistortion(originalVec, projectedVec):
     return abs((np.dot(projectedVec, projectedVec) / np.dot(originalVec, originalVec)) - 1)
 
 
-def MaxDistortion(original_distance, projected_distance):
+def OLD_MaxDistortion(original_distance, projected_distance):
     max_distortion = 0.0
     assert(original_distance.shape[0] == projected_distance.shape[0])
     assert(original_distance.shape[1] == projected_distance.shape[1])
@@ -70,4 +70,17 @@ def MaxDistortion(original_distance, projected_distance):
 def CalculateJLLema(number_of_samples, projected_sample_dimension, delta=0.01):
     return math.sqrt(6.0 * math.log((number_of_samples**2)/delta) / projected_sample_dimension)
 	
-	
+
+def MaxDistortion(original_distance, projected_distance):
+    max_distortion = 0.0
+
+    n_docs = original_distance.shape[0]
+    index = 0
+    for x in range(0, n_docs):
+        for y in range(x + 1, n_docs):
+            if original_distance[x][y] != 0.0:
+                curr_distortion = abs((projected_distance[index] / original_distance[x][y]) - 1.0)
+                if curr_distortion > max_distortion:
+                    max_distortion = curr_distortion
+            index = index + 1
+    return max_distortion
