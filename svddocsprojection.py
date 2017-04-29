@@ -38,12 +38,16 @@ def MaxDistortionSVD(original_distance, projected_distance):
     return max_distortion, max_strech
 
 def SVDDocsProjection (documents, mtx_original_distance, N, d, number_of_documents, path):
-  # Create DataDocs
-  data_doc = np.zeros(shape = (number_of_documents, d))
-  for doc_id in range(number_of_documents):
-    for word_id, count_w in documents[doc_id].items():
-      data_doc[doc_id, word_id] = float(count_w)
-    
+  data_doc = None
+  if isinstance(documents, dict):
+    # Create DataDocs
+    data_doc = np.zeros(shape = (number_of_documents, d))
+    for doc_id in range(number_of_documents):
+      for word_id, count_w in documents[doc_id].items():
+        data_doc[doc_id, word_id] = float(count_w)
+  elif isinstance(documents, np.ndarray):
+    data_doc = documents.T
+        
   print('SVD Case', N, data_doc.shape)
          
   print("SVD")
