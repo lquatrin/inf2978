@@ -39,8 +39,8 @@ def RunVersion01(documents, mtx_original_distance, N, repeat, d, number_of_docum
   n = N
 
   #se N for maior que 4096
-  if N > 4096:
-    return
+  #if N > 4096:
+  #  return
     
   print("V1 Caso: ", N)
   #matrizes com os tempos:
