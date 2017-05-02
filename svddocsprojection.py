@@ -37,7 +37,7 @@ def MaxDistortionSVD(original_distance, projected_distance):
             index = index + 1
     return max_distortion, max_strech
 
-def SVDDocsProjection (documents, mtx_original_distance, N, d, number_of_documents, path):
+def SVDDocsProjection (documents, N, d, number_of_documents, path):
   A = None
   if isinstance(documents, dict):
     # Create DataDocs
@@ -65,32 +65,45 @@ def SVDDocsProjection (documents, mtx_original_distance, N, d, number_of_documen
   f_clock = time.clock()
   print('- Ak  Time: ', (f_clock - s_clock))
 
-  #Quality Measure 1:
+  #Quality Measure 1: % of A
   # 1 - (||A_k - A|| / ||A||)
-  s_clock = time.clock()
 
+  s_clock = time.clock()
   norma_frob = np.linalg.norm(A_k - A)
+  f_clock = time.clock()
+  print('- Espectral Norm: ', (f_clock - s_clock))
+  print('  ', norma_frob)
+  
+  s_clock = time.clock()
   norma_frob_orig = np.linalg.norm(A)
   quality_1 = 1.0 - (norma_frob / norma_frob_orig)
   f_clock = time.clock()
 
-  print('- Quality 1: ', (f_clock - s_clock))
+  print('- Percentage Similarity: ', (f_clock - s_clock))
   print('  ', quality_1 * 100.0)
   
-  #Quality Measure 2
+  #Quality Measure 2: portion of singular total value
   # 100 * ( (soma_sig)**2 / frob(A)**2)
   s_clock = time.clock()
-  quality_2 = 100.0 * (np.sum(vS)**2 / (norma_frob_orig**2))
+  quality_2 = 100.0 * (np.linalg.norm(vS)**2 / (norma_frob_orig**2))
   f_clock = time.clock()
 
-  print('- Quality 2: ', (f_clock - s_clock))
+  print('- Singular Value Quantity: ', (f_clock - s_clock))
   print('  ', quality_2)
 
   #Error Measure  
+  A_k = A - A_k
+  max_err = -float(math.inf)
   s_clock = time.clock()
-
+  D = np.dot(A_k, A.T)
+  max_err = np.amax(abs(D))
   f_clock = time.clock()
 
+  print('- Max Error: ', (f_clock - s_clock))
+  print('  ', max_err)
+
+  #Approximation error
+  # ||A - Ak|| = s_k+1
 
   #http://scikit-bio.org/docs/0.2.0/generated/skbio.stats.distance.html
   #http://stackoverflow.com/questions/1871536/euclidean-distance-between-points-in-two-different-numpy-arrays-not-within
