@@ -21,7 +21,7 @@ import gc
 def MaxDistortionSVD(original_distance, projected_distance):
     max_distortion = 0.0
     max_strech = 0.0
-
+    
     n_docs = original_distance.shape[0]
     index = 0
     for x in range(0, n_docs):
@@ -39,6 +39,7 @@ def MaxDistortionSVD(original_distance, projected_distance):
 
 def SVDDocsProjection (documents, N, d, number_of_documents, path):
   A = None
+  report = dict()
   if isinstance(documents, dict):
     # Create DataDocs
     A = np.zeros(shape = (number_of_documents, d))
@@ -52,35 +53,37 @@ def SVDDocsProjection (documents, N, d, number_of_documents, path):
          
   # Call SVD for sparse matrices
   s_clock = time.clock()
-  #U, S, Vt = np.linalg.svd(data_doc, full_matrices = False)
   U, vS, Vt = linalg.svds(A, k = N, which = 'LM')
   f_clock = time.clock()
 
-  print('- SVD Time: ', (f_clock - s_clock))
+  report['svdtime'] = (f_clock - s_clock)
 
   #Generating A_k
   s_clock = time.clock()
   S = np.diag(vS)
   A_k = np.dot(np.dot(U, S), Vt)
   f_clock = time.clock()
-  print('- Ak  Time: ', (f_clock - s_clock))
 
+  report['akbuildtime'] = (f_clock - s_clock)
+  
   #Quality Measure 1: % of A
   # 1 - (||A_k - A|| / ||A||)
 
+  A_k = A - A_k
   s_clock = time.clock()
-  norma_frob = np.linalg.norm(A_k - A)
+  norma_frob = np.linalg.norm(A_k)
   f_clock = time.clock()
-  print('- Espectral Norm: ', (f_clock - s_clock))
-  print('  ', norma_frob)
+
+  report['time_espectralnorm'] = (f_clock - s_clock)
+  report['espectralnorm'] = norma_frob**2
   
-  s_clock = time.clock()
+  #s_clock = time.clock()
   norma_frob_orig = np.linalg.norm(A)
   quality_1 = 1.0 - (norma_frob / norma_frob_orig)
   f_clock = time.clock()
 
-  print('- Percentage Similarity: ', (f_clock - s_clock))
-  print('  ', quality_1 * 100.0)
+  report['time_q1'] = (f_clock - s_clock)
+  report['q1'] = quality_1 * 100.0
   
   #Quality Measure 2: portion of singular total value
   # 100 * ( (soma_sig)**2 / frob(A)**2)
@@ -88,19 +91,18 @@ def SVDDocsProjection (documents, N, d, number_of_documents, path):
   quality_2 = 100.0 * (np.linalg.norm(vS)**2 / (norma_frob_orig**2))
   f_clock = time.clock()
 
-  print('- Singular Value Quantity: ', (f_clock - s_clock))
-  print('  ', quality_2)
+  report['time_q2'] = (f_clock - s_clock)
+  report['q2'] = quality_2
 
-  #Error Measure  
-  A_k = A - A_k
+  #Error Measure
   max_err = -float(math.inf)
   s_clock = time.clock()
   D = np.dot(A_k, A.T)
   max_err = np.amax(abs(D))
   f_clock = time.clock()
 
-  print('- Max Error: ', (f_clock - s_clock))
-  print('  ', max_err)
+  report['time_maxerr'] = (f_clock - s_clock)
+  report['maxerr'] = max_err
 
   #Approximation error
   # ||A - Ak|| = s_k+1
@@ -121,11 +123,4 @@ def SVDDocsProjection (documents, N, d, number_of_documents, path):
   #max_distortion, mst = MaxDistortionSVD(mtx_original_distance, projected_distances)
   #print(max_distortion, mst)
 
-  #f_clock = time.clock()
-  #dist_time = (f_clock - s_clock)
-
-  #text_file = open(path + str(N) + "_svd_docs.txt", "w")
-  #text_file.write("%s\t%s\t%s\t%s\n" % ('svd_time', 'proj_time', 'dist_time', 'frobenius'))
-  #text_file.write("%f\t%f\t%f\t%f\n" % (svd_time, proj_time, dist_time, max_distortion))
-  
-  #text_file.close()
+  return report
