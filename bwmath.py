@@ -83,4 +83,4 @@ def MaxDistortion(original_distance, projected_distance):
                 if curr_distortion > max_distortion:
                     max_distortion = curr_distortion
             index = index + 1
-    return max_distortion
+    return max_distortion #np.amax(abs((projected_distance / original_distance) - 1))

@@ -37,7 +37,7 @@ def MaxDistortionSVD(original_distance, projected_distance):
             index = index + 1
     return max_distortion, max_strech
 
-def SVDDocsProjection (documents, N, d, number_of_documents, path):
+def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, path):
   A = None
   report = dict()
   if isinstance(documents, dict):
