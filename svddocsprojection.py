@@ -25,18 +25,11 @@ def MaxDistortionSVD(original_distance, projected_distance):
     n_docs = original_distance.shape[0]
     index = 0
     for x in range(0, n_docs):
-        for y in range(x + 1, n_docs):
-            if original_distance[x][y] != 0.0:
-                curr_distortion = abs((projected_distance[index] / original_distance[x][y]) - 1.0)
-                if curr_distortion > max_distortion:
-                    max_distortion = curr_distortion
-            if projected_distance[index] != 0.0:
-                curr_distortion = abs((original_distance[x][y] / projected_distance[index]) - 1.0)
-                if curr_distortion > max_strech:
-                    max_strech = curr_distortion
-            index = index + 1
-    return max_distortion, max_strech
-
+      if original_distance[x] != 0.0:
+        curr_distortion = abs((projected_distance[x] / original_distance[x]) - 1.0)
+        if curr_distortion > max_distortion:
+          max_distortion = curr_distortion
+    return max_distortion
 def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, path):
   A = None
   report = dict()
@@ -48,6 +41,8 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
         A[doc_id, word_id] = float(count_w)
   elif isinstance(documents, np.ndarray):
     A = documents.T
+
+  
         
   print('SVD Case', N, A.shape)
          
@@ -55,6 +50,8 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   s_clock = time.clock()
   U, vS, Vt = linalg.svds(A, k = N, which = 'LM')
   f_clock = time.clock()
+
+  # S_N+1
 
   report['svdtime'] = (f_clock - s_clock)
 
@@ -69,13 +66,24 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   #Quality Measure 1: % of A
   # 1 - (||A_k - A|| / ||A||)
 
+  #print("max dist")
+  #projected_distances = pdist(A_k, 'cosine')
+ # projected_distances = (d / N) * projected_distances
+
+  
+  
+ # max_distortion = MaxDistortionSVD(distance_array, projected_distances)
+
+  #print(max_distortion)
+
+
   A_k = A - A_k
   s_clock = time.clock()
   norma_frob = np.linalg.norm(A_k)
   f_clock = time.clock()
 
   report['time_espectralnorm'] = (f_clock - s_clock)
-  report['espectralnorm'] = norma_frob**2
+  report['espectralnorm'] = norma_frob
   
   #s_clock = time.clock()
   norma_frob_orig = np.linalg.norm(A)
@@ -104,6 +112,20 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   report['time_maxerr'] = (f_clock - s_clock)
   report['maxerr'] = max_err
 
+
+
+
+  # Y = pdist(X, 'cosine')
+  
+  # dot(v1, v2) similarity between v1 and v2 (higher value, higher similarity)
+
+  #distancia do espaço projetado * sqrt(orig_dim / N)
+
+  #sig(k+1) =  min(||A - Ak||)
+
+  #r = 1/d_orig
+  #e = 1 - r
+
   #Approximation error
   # ||A - Ak|| = s_k+1
 
@@ -116,7 +138,6 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   #s_clock = time.clock()
   #projected_distances = sp.distance.pdist(data_doc.T, metric='euclidean')
   #projected_distances, s_time = bwdistance.DoEuclidianDistanceProjDocs(data_doc.T)
-  #projected_distances = pdist(data_doc, 'sqeuclidean')
 
   #print("Distortion")
   #max_distortion = np.linalg.norm(data_doc)
