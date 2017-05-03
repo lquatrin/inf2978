@@ -58,7 +58,8 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   ##########################################
   s_clock = time.clock()
   S = np.diag(vS)
-  A_k = np.dot(U, S)
+  A_k = np.dot(np.dot(U, S), Vt)
+  #A_k = np.dot(U, S)
   f_clock = time.clock()
 
   report['time_reconstruction'] = (f_clock - s_clock)
@@ -73,7 +74,7 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   report['max_distortion'] = max_distortion
   report['time_dist'] = (f_clock - s_clock)
 
-  A_k = np.dot(A_k, Vt)
+  #A_k = np.dot(A_k, Vt)
   A_k = A - A_k
   norma_frob = np.linalg.norm(A_k)
   #Quality Measure 1: % of A
