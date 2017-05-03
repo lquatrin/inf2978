@@ -30,6 +30,8 @@ def MaxDistortionSVD(original_distance, projected_distance):
         if curr_distortion > max_distortion:
           max_distortion = curr_distortion
     return max_distortion
+
+
 def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, path):
   A = None
   report = dict()
@@ -42,106 +44,49 @@ def SVDDocsProjection (documents, distance_array, N, d, number_of_documents, pat
   elif isinstance(documents, np.ndarray):
     A = documents.T
 
-  
-        
-  print('SVD Case', N, A.shape)
-         
+  print("SVD", N)
+
   # Call SVD for sparse matrices
+  ##########################################
   s_clock = time.clock()
   U, vS, Vt = linalg.svds(A, k = N, which = 'LM')
   f_clock = time.clock()
 
-  # S_N+1
+  report['time_svd'] = (f_clock - s_clock)
 
-  report['svdtime'] = (f_clock - s_clock)
-
-  #Generating A_k
+  # Generating A_k
+  ##########################################
   s_clock = time.clock()
   S = np.diag(vS)
-  A_k = np.dot(np.dot(U, S), Vt)
+  A_k = np.dot(U, S)
   f_clock = time.clock()
 
-  report['akbuildtime'] = (f_clock - s_clock)
-  
+  report['time_reconstruction'] = (f_clock - s_clock)
+
+  # Max Distortion
+  ##########################################
+  s_clock = time.clock()
+  projected_distances = pdist(A_k, metric='sqeuclidean')
+  max_distortion = MaxDistortionSVD(distance_array, projected_distances)
+  f_clock = time.clock()
+
+  report['max_distortion'] = max_distortion
+  report['time_dist'] = (f_clock - s_clock)
+
+  A_k = np.dot(A_k, Vt)
+  A_k = A - A_k
+  norma_frob = np.linalg.norm(A_k)
   #Quality Measure 1: % of A
   # 1 - (||A_k - A|| / ||A||)
-
-  #print("max dist")
-  #projected_distances = pdist(A_k, 'cosine')
- # projected_distances = (d / N) * projected_distances
-
-  
-  
- # max_distortion = MaxDistortionSVD(distance_array, projected_distances)
-
-  #print(max_distortion)
-
-
-  A_k = A - A_k
-  s_clock = time.clock()
-  norma_frob = np.linalg.norm(A_k)
-  f_clock = time.clock()
-
-  report['time_espectralnorm'] = (f_clock - s_clock)
-  report['espectralnorm'] = norma_frob
-  
-  #s_clock = time.clock()
   norma_frob_orig = np.linalg.norm(A)
   quality_1 = 1.0 - (norma_frob / norma_frob_orig)
-  f_clock = time.clock()
-
-  report['time_q1'] = (f_clock - s_clock)
+ 
   report['q1'] = quality_1 * 100.0
-  
+
   #Quality Measure 2: portion of singular total value
   # 100 * ( (soma_sig)**2 / frob(A)**2)
-  s_clock = time.clock()
   quality_2 = 100.0 * (np.linalg.norm(vS)**2 / (norma_frob_orig**2))
-  f_clock = time.clock()
 
-  report['time_q2'] = (f_clock - s_clock)
   report['q2'] = quality_2
-
-  #Error Measure
-  max_err = -float(math.inf)
-  s_clock = time.clock()
-  D = np.dot(A_k, A.T)
-  max_err = np.amax(abs(D))
-  f_clock = time.clock()
-
-  report['time_maxerr'] = (f_clock - s_clock)
-  report['maxerr'] = max_err
-
-
-
-
-  # Y = pdist(X, 'cosine')
   
-  # dot(v1, v2) similarity between v1 and v2 (higher value, higher similarity)
-
-  #distancia do espaço projetado * sqrt(orig_dim / N)
-
-  #sig(k+1) =  min(||A - Ak||)
-
-  #r = 1/d_orig
-  #e = 1 - r
-
-  #Approximation error
-  # ||A - Ak|| = s_k+1
-
-  #http://scikit-bio.org/docs/0.2.0/generated/skbio.stats.distance.html
-  #http://stackoverflow.com/questions/1871536/euclidean-distance-between-points-in-two-different-numpy-arrays-not-within
-  #https://docs.scipy.org/doc/scipy-0.19.0/reference/spatial.distance.html
-  #http://stackoverflow.com/questions/22720864/efficiently-calculating-a-euclidean-distance-matrix-using-numpy
-  #https://docs.scipy.org/doc/scipy-0.19.0/reference/spatial.distance.html
-  #print("Euclidean Distance")
-  #s_clock = time.clock()
-  #projected_distances = sp.distance.pdist(data_doc.T, metric='euclidean')
-  #projected_distances, s_time = bwdistance.DoEuclidianDistanceProjDocs(data_doc.T)
-
-  #print("Distortion")
-  #max_distortion = np.linalg.norm(data_doc)
-  #max_distortion, mst = MaxDistortionSVD(mtx_original_distance, projected_distances)
-  #print(max_distortion, mst)
-
   return report
