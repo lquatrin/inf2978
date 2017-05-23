@@ -1,6 +1,8 @@
 import numpy as np
 import msvcrt as m
 
+import re
+
 def CreateShingle(ngram_size, filename):
   ret_set = set()
 
@@ -11,14 +13,26 @@ def CreateShingle(ngram_size, filename):
     content = ''.join(content).replace('\n',' ').lower()
     
     #TODO: Remove not used characters: é, ã, ê, ., ;, :, ...
-    # ' to white space
-    content = content.replace('ç', 'c').replace('é', 'e').replace('á', 'a')
-    #content.replace("Is", "Was")
+    content = content.replace('ç', 'c')
+    
+    content = content.replace('â', 'a').replace('á', 'a').replace('à', 'a').replace('ã', 'a')
+    content = content.replace('ê', 'e').replace('é', 'e').replace('è', 'e')
+    content = content.replace('î', 'i').replace('í', 'i').replace('ì', 'i')
+    content = content.replace('ô', 'o').replace('ó', 'o').replace('ò', 'o').replace('õ', 'o')
+    content = content.replace('û', 'u').replace('ú', 'u').replace('ù', 'u')
+
+    content = content.replace('!', ' ').replace('?', ' ').replace('.', ' ')
+    
+    content = content.replace('-', ' ').replace("'", ' ').replace('…', ' ').replace('\"', ' ')
+    content = content.replace(';', ' ').replace(':', ' ').replace(',', ' ')
+
+    content = content.replace('(', ' ').replace('[', ' ').replace('{', ' ')
+    content = content.replace(')', ' ').replace(']', ' ').replace('}', ' ')
 
     print(content)
 
   #Get a slice: s[start:end], starts in 0
-  assert(len(content) >= 4)
+  assert(len(content) >= ngram_size)
 
   #[' '.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)]
   for i in range(ngram_size, len(content)):
