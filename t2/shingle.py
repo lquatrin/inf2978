@@ -1,7 +1,10 @@
 import numpy as np
 import msvcrt as m
-
 import re
+from collections import defaultdict
+from multiprocessing import Process
+from datasketch import MinHash, MinHashLSH
+
 
 def CreateShingle(ngram_size, filename):
   ret_set = set()
@@ -21,8 +24,13 @@ def CreateShingle(ngram_size, filename):
     content = content.replace('ô', 'o').replace('ó', 'o').replace('ò', 'o').replace('õ', 'o')
     content = content.replace('û', 'u').replace('ú', 'u').replace('ù', 'u')
 
-    # ? ! ' . - " … : ; ,
-    content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
+    content = content.replace('!', ' ').replace('?', ' ').replace('.', ' ')
+    
+    content = content.replace('-', ' ').replace("'", ' ').replace('…', ' ').replace('\"', ' ')
+    content = content.replace(';', ' ').replace(':', ' ').replace(',', ' ')
+
+    content = content.replace('(', ' ').replace('[', ' ').replace('{', ' ')
+    content = content.replace(')', ' ').replace(']', ' ').replace('}', ' ')
 
     print(content)
 
@@ -39,6 +47,37 @@ def CreateShingle(ngram_size, filename):
 #    array = []
 #    for line in ins:
 #        array.append(line)
+ 
+def CreateShingle2(input,ngram_size):
+  
+  with open(input, "rb") as f:
+    content = f.read()
+
+  tokens = content.split()
+  if ngram_size > len(tokens):
+      return ' '.join(tokens)
+  
+  return [' '.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)]
+
+def buildMinHash(shingle_list,num_perm=128):
+  mhash = MinHash(num_perm=num_perm)
+  for shingle in shingle_list:
+      try:
+          mhash.update(shingle.encode('utf8'))
+      except UnicodeEncodeError:
+          continue
+  return mhash
 
 
-#http://programminghistorian.org/lessons/cleaning-ocrd-text-with-regular-expressions
+#receive minHash LSH https://ekzhu.github.io/datasketch/lsh.html  
+def duplicates(lsh_index):
+
+  possible_duplicates = []
+  for bucket in lsh_index.hashtables:
+      for elem in bucket.values():
+          if len(elem) > 1:
+              possible_duplicates.append(elem)
+  
+  return possible_duplicates
+
+  

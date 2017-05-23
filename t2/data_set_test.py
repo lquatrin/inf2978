@@ -3,7 +3,7 @@ import sys,os
 import numpy as np
 
 import shingle
-
+from datasketch import MinHash, MinHashLSH
 root = ""
 #root = "F:/"
 #root = "D:/inf2978t2dataset/"
@@ -16,23 +16,36 @@ hash_functions = 50
 
 #MinHash P1
 # Já Criar as permutações aqui para usar diretamente em cada doc
-d_permutations = dict()
-for i in range(hash_functions):
-  d_permutations[i] = np.random.permutation(red_sequences)
+#d_permutations = dict()
+#for i in range(hash_functions):
+#  d_permutations[i] = np.random.permutation(red_sequences)
  
-n_count = 0
-d_shingles = dict()
+#n_count = 0
+#d_shingles = dict()
+
+# https://ekzhu.github.io/datasketch/lsh.html
+lsh_threshold = 0.1
+lsh = MinHashLSH(threshold=lsh_threshold,num_perm= hash_functions)
+
+
+
 for r,d,f in os.walk(path):
     for file in f:
         filename = r.replace('\\','/') + '/' + file
 
         #-------------> Shingle
-        d_shingles[n_count] = shingle.CreateShingle(n_shingle, filename)
-        print(d_shingles[n_count])
+        #d_shingles[n_count] = shingle.CreateShingle(n_shingle, filename)
+        
+        d_shingles = shingle.CreateShingle2(filename,n_shingle)
+        print(d_shingles)
 
         #-------------> MinHash
-        # TODO
-
+        
+        mhash = build_minhash(d_shingles, num_perm=hash_functions)
+        
+        #to do -> insert key and hash to build lsh
+        #lsh.insert(....)
+        
         n_count = n_count + 1
 
         input("Press Enter to continue...")
