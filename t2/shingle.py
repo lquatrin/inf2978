@@ -21,13 +21,8 @@ def CreateShingle(ngram_size, filename):
     content = content.replace('ô', 'o').replace('ó', 'o').replace('ò', 'o').replace('õ', 'o')
     content = content.replace('û', 'u').replace('ú', 'u').replace('ù', 'u')
 
-    content = content.replace('!', ' ').replace('?', ' ').replace('.', ' ')
-    
-    content = content.replace('-', ' ').replace("'", ' ').replace('…', ' ').replace('\"', ' ')
-    content = content.replace(';', ' ').replace(':', ' ').replace(',', ' ')
-
-    content = content.replace('(', ' ').replace('[', ' ').replace('{', ' ')
-    content = content.replace(')', ' ').replace(']', ' ').replace('}', ' ')
+    # ? ! ' . - " … : ; ,
+    content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
 
     print(content)
 
@@ -44,3 +39,6 @@ def CreateShingle(ngram_size, filename):
 #    array = []
 #    for line in ins:
 #        array.append(line)
+
+
+#http://programminghistorian.org/lessons/cleaning-ocrd-text-with-regular-expressions
