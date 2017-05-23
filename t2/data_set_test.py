@@ -6,7 +6,7 @@ import shingle
 
 root = ""
 #root = "F:/"
-root = "D:/inf2978t2dataset/"
+#root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
 
@@ -27,7 +27,7 @@ for r,d,f in os.walk(path):
         filename = r.replace('\\','/') + '/' + file
 
         #-------------> Shingle
-        d_shingles[n_count] = shingle.CreateShingle(filename)
+        d_shingles[n_count] = shingle.CreateShingle(n_shingle, filename)
         print(d_shingles[n_count])
 
         #-------------> MinHash
