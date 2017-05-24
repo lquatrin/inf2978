@@ -6,8 +6,14 @@ from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
 
 
-def CreateShingle(ngram_size, filename):
+#list_coef = [27**3, 27**2, 27**1, 27**0]
+def CreateShingle(ngram_size, filename, max_hash_val = None):
   ret_set = set()
+
+  if max_hash_val is None:
+    max_hash_val = 24**ngram_size
+  
+  list_coef = [27**3, 27**2, 27**1, 27**0]
 
   with open(filename, "rb") as f:
     content = f.read().decode("UTF-8")
@@ -24,8 +30,12 @@ def CreateShingle(ngram_size, filename):
     content = content.replace('ô', 'o').replace('ó', 'o').replace('ò', 'o').replace('õ', 'o')
     content = content.replace('û', 'u').replace('ú', 'u').replace('ù', 'u')
 
-	# ? ! ' . - " … : ; ,
+    # ? ! ' . - " … : ; ,
     content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
+    content = re.sub("[1234567890]", ' ', content)
+
+    #trocar ' ' por '`' para facilitar o hash depois
+    content = re.sub(' ', chr(96), content)
 
     print(content)
 
@@ -34,8 +44,10 @@ def CreateShingle(ngram_size, filename):
 
   #[' '.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)]
   for i in range(ngram_size, len(content)):
-    ret_set.add(content[i-ngram_size:i])
+    #old ret_set.add(content[i-ngram_size:i])
+    ret_set.add(sum([a*b for a,b in zip(list_coef, [ord(i)-96 for i in content[i-ngram_size:i]])]) % max_hash_val)
 
-  return ret_set
+    #utilizando hash ' ' para '`'
+    #[ord(i)-96 for i in a]
 
-  
+  return ret_set 
