@@ -6,15 +6,44 @@ from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
  
 def CreateShingle(finput, ngram_size):
-  
-  with open(finput, "rb") as f:
-    content = f.read()
 
-  tokens = content.split()
+  tokens = None
+  with open(finput, "rb") as f:
+    content = f.read().decode("UTF-8")
+
+    if len(content) == 0:
+      return ret_set
+    
+    #Concatenate each line and replace '\n' by ' '
+    content = ''.join(content).replace('\n',' ').lower()
+    
+    #TODO: Remove not used characters: é, ã, ê, ., ;, :, ...
+
+    # ç
+    content = re.sub("[ç]"   , 'c', content)  
+    # â á à ã
+    content = re.sub("[âáàã]", 'a', content)
+    # ê é è
+    content = re.sub("[êéè]" , 'e', content)
+    # î í ì
+    content = re.sub("[îíì]" , 'i', content)
+    # ô ó ò õ
+    content = re.sub("[ôóòõ]", 'o', content)
+    # û ú ù
+    content = re.sub("[ûúù]" , 'u', content)
+
+    # ? ! ' . - " … : ; , [ ] ( ) { }
+    content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
+    
+    # 1 2 3 4 5 6 7 8 9 0
+    content = re.sub("[1234567890]", ' ', content)
+
+    tokens = content
+
   if ngram_size > len(tokens):
-      return ' '.join(tokens)
+      return ''.join(tokens)
   
-  return [' '.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)]
+  return set([''.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)])
 
 def buildMinHash(shingle_list,num_perm=128):
   mhash = MinHash(num_perm=num_perm)
@@ -51,11 +80,12 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50):
       filename = r.replace('\\','/') + '/' + file
       
       #-------------> Shingle
+      print(filename)
       d_shingles = CreateShingle(filename, n_gram)
       print(d_shingles)
 
       #-------------> MinHash
-      mhash = build_minhash(n_gram, num_perm=hash_signatures)
+      #mhash = build_minhash(n_gram, num_perm=hash_signatures)
         
       #to do -> insert key and hash to build lsh
       #lsh.insert(....)
