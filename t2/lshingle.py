@@ -22,13 +22,13 @@ def CreateShingle(ngram_size, filename, max_hash_val = None):
     content = ''.join(content).replace('\n',' ').lower()
     
     #TODO: Remove not used characters: é, ã, ê, ., ;, :, ...
-    content = content.replace('ç', 'c')
+    content = re.sub("[ç]"   , 'c', content)
     
-    content = content.replace('â', 'a').replace('á', 'a').replace('à', 'a').replace('ã', 'a')
-    content = content.replace('ê', 'e').replace('é', 'e').replace('è', 'e')
-    content = content.replace('î', 'i').replace('í', 'i').replace('ì', 'i')
-    content = content.replace('ô', 'o').replace('ó', 'o').replace('ò', 'o').replace('õ', 'o')
-    content = content.replace('û', 'u').replace('ú', 'u').replace('ù', 'u')
+    content = re.sub("[âáàã]", 'a', content)
+    content = re.sub("[êéè]" , 'e', content)
+    content = re.sub("[îíì]" , 'i', content)
+    content = re.sub("[ôóòõ]", 'o', content)
+    content = re.sub("[ûúù]" , 'u', content)
 
     # ? ! ' . - " … : ; ,
     content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
