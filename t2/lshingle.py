@@ -51,3 +51,5 @@ def CreateShingle(ngram_size, filename, max_hash_val = None):
     #[ord(i)-96 for i in a]
 
   return ret_set 
+
+#sum([u==v for u,v in zip(a,b)])/len(a)
