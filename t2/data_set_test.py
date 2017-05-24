@@ -3,6 +3,10 @@ import sys,os
 import numpy as np
 
 import shingle
+import lshingle
+import time
+
+
 from datasketch import MinHash, MinHashLSH
 root = ""
 #root = "F:/"
@@ -21,35 +25,16 @@ hash_functions = 50
 #  d_permutations[i] = np.random.permutation(red_sequences)
  
 #n_count = 0
-#d_shingles = dict()
 
 # https://ekzhu.github.io/datasketch/lsh.html
 lsh_threshold = 0.1
 lsh = MinHashLSH(threshold=lsh_threshold,num_perm= hash_functions)
 
+#Read Songs and Create Shingle sets
+d_shingles, d_names = lshingle.ReadSongFiles(path, n_gram = n_shingle, max_documents = 100)
 
 
-for r,d,f in os.walk(path):
-    for file in f:
-        filename = r.replace('\\','/') + '/' + file
-
-        #-------------> Shingle
-        #d_shingles[n_count] = shingle.CreateShingle(n_shingle, filename)
-        
-        d_shingles = shingle.CreateShingle2(filename,n_shingle)
-        print(d_shingles)
-
-        #-------------> MinHash
-        
-        mhash = build_minhash(d_shingles, num_perm=hash_functions)
-        
-        #to do -> insert key and hash to build lsh
-        #lsh.insert(....)
-        
-        n_count = n_count + 1
-
-        input("Press Enter to continue...")
-
+#https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
 
 similarity_threshold = 0.6
 # r * b = hash_functions
@@ -57,9 +42,7 @@ r_rows = 5
 b_bands = 10
 assert((r_rows * b_bands) == hash_functions)
 #LSH discutido em aula
-
-
-     
+    
 
 
 #Aspectos da implementação
