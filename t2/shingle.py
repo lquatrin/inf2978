@@ -1,10 +1,9 @@
 import numpy as np
 import msvcrt as m
-import re
+import re, os
 from collections import defaultdict
 from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
-
 
 def CreateShingle(ngram_size, filename):
   ret_set = set()
@@ -80,4 +79,27 @@ def duplicates(lsh_index):
   
   return possible_duplicates
 
-  
+
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50):
+  d_names = dict()
+  d_shingles = dict()
+
+  # https://ekzhu.github.io/datasketch/lsh.html
+  lsh_threshold = 0.1
+  lsh = MinHashLSH(threshold=lsh_threshold,num_perm= hash_signatures)
+
+  for r,d,f in os.walk(path):
+    for file in f:
+      filename = r.replace('\\','/') + '/' + file
+
+      #-------------> Shingle
+      d_shingles = CreateShingle2(filename,n_gram)
+
+      #-------------> MinHash
+      mhash = build_minhash(n_gram, num_perm=hash_signatures)
+        
+      #to do -> insert key and hash to build lsh
+      #lsh.insert(....)
+        
+      input("Press Enter to continue...")
+  return d_shingles, d_names  

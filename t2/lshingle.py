@@ -66,12 +66,20 @@ def CreateShingle(ngram_size, filename, max_hash_val = None):
 
   return ret_set 
 
+#To Calculate LSH similarity
 #sum([u==v for u,v in zip(a,b)])/len(a)
 
-def ReadSongFiles(path, n_gram = 4, max_documents = None):
+#https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10):
   d_names = dict()
   d_shingles = dict()
 
+  # MinHash Permutations
+  # Já Criar as permutações aqui para usar diretamente em cada doc
+  #d_permutations = dict()
+  #for i in range(hash_functions):
+  #  d_permutations[i] = np.random.permutation(red_sequences)
+   
   if max_documents is None:
     max_documents = sys.maxsize
 
