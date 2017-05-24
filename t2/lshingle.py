@@ -8,6 +8,11 @@ from collections import defaultdict
 from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
 
+#http://www.bogotobogo.com/Algorithms/minHash_Jaccard_Similarity_Locality_sensitive_hashing_LSH.php
+#http://maciejkula.github.io/2015/02/01/minhash/
+#http://mccormickml.com/2015/06/12/minhash-tutorial-with-python-code/
+#https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
+
 #list_coef = [27**3, 27**2, 27**1, 27**0]
 def CreateShingle(ngram_size, filename, max_hash_val = None):
   ret_set = set()
@@ -107,6 +112,4 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10):
           return d_shingles, d_names
       #input("Press Enter to continue...")
 
-  return d_shingles, d_names
-
-  
+  return d_shingles, d_names 
