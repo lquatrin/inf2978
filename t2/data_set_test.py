@@ -21,11 +21,16 @@ b_bands = 10
 d_shingles, d_minhash, lsh = shingle.ReadSongFiles(path, n_gram = n_shingle, max_documents = 5000, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold)
 
 #LSH discutido em aula
+added_songs = dict()
 for key, v_minhash in d_minhash.items():
-  result = lsh.query(v_minhash)
-  #print("Approximate neighbours with Jaccard similarity > " + str(similarity_threshold), result)
-  if len(result) > 1:
-    input(str(len(result)) + ': ' + (';'.join(map(str,result))))
+  if not key in added_songs:
+    result = lsh.query(v_minhash)
+
+    for i in range(len(result)):
+      added_songs[result[i]] = True
+    
+    if len(result) > 1:
+      input(str(len(result)) + ': ' + (';'.join(map(str,result))))
 
 #Aspectos da implementação
 #Plataforma de execução e desempenho computacional do método
