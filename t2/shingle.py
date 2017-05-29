@@ -67,28 +67,38 @@ def duplicates(lsh_index):
   return possible_duplicates
 
 
-def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50):
-  d_names = dict()
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, lsh_threshold = 0.9):
   d_shingles = dict()
+  d_minhash = dict()
 
   # https://ekzhu.github.io/datasketch/lsh.html
-  lsh_threshold = 0.1
-  lsh = MinHashLSH(threshold=lsh_threshold,num_perm= hash_signatures)
+  lsh = MinHashLSH(threshold = lsh_threshold, num_perm = hash_signatures)
 
+
+  count = 0
   for r,d,f in os.walk(path):
     for file in f:
-      filename = r.replace('\\','/') + '/' + file
+      pathf = r.replace('\\','/')
+      filename = pathf + '/' + file
+
+      d_author_name = pathf[pathf.rfind('/') +1:] + '/' + file
       
       #-------------> Shingle
-      print(filename)
-      d_shingles = CreateShingle(filename, n_gram)
-      print(d_shingles)
+      #print(filename)
+      d_shingles[d_author_name] = CreateShingle(filename, n_gram)
+      #print(d_shingles)
 
       #-------------> MinHash
-      #mhash = build_minhash(n_gram, num_perm=hash_signatures)
-        
-      #to do -> insert key and hash to build lsh
-      #lsh.insert(....)
-        
-      input("Press Enter to continue...")
-  return d_shingles, d_names  
+      d_minhash[d_author_name] = MinHash(num_perm = hash_signatures)
+      for d in d_shingles[d_author_name]:
+        d_minhash[d_author_name].update(d.encode('utf8'))
+
+      lsh.insert(d_author_name, d_minhash[d_author_name])
+
+      count = count + 1
+      if count > max_documents:
+        return d_shingles, d_minhash, lsh
+      
+      #input("Press Enter to continue...")
+
+  return d_shingles, d_minhash, lsh
