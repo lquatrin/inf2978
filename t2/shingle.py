@@ -12,7 +12,7 @@ def CreateShingle(finput, ngram_size):
     content = f.read().decode("UTF-8")
 
     if len(content) == 0:
-      return set('')
+      return None
     
     #Concatenate each line and replace '\n' by ' '
     content = ''.join(content).replace('\n',' ').lower()
@@ -95,8 +95,12 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, 
       
       #-------------> Shingle
       #print(filename)
-      d_shingles[d_author_name] = CreateShingle(filename, n_gram)
-      #print(d_shingles)
+      fshingle = CreateShingle(filename, n_gram)
+
+      if fshingle is None:
+        continue
+      
+      d_shingles[d_author_name] = fshingle
 
       #-------------> MinHash
       d_minhash[d_author_name] = MinHash(num_perm = hash_signatures)
