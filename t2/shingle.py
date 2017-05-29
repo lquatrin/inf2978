@@ -12,7 +12,7 @@ def CreateShingle(finput, ngram_size):
     content = f.read().decode("UTF-8")
 
     if len(content) == 0:
-      return ret_set
+      return set('')
     
     #Concatenate each line and replace '\n' by ' '
     content = ''.join(content).replace('\n',' ').lower()
@@ -36,12 +36,22 @@ def CreateShingle(finput, ngram_size):
     content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
     
     # 1 2 3 4 5 6 7 8 9 0
-    content = re.sub("[1234567890]", ' ', content)
+    #content = re.sub("[1234567890]", ' ', content)
+    content = re.sub("[1]", 'um', content)
+    content = re.sub("[2]", 'dois', content)
+    content = re.sub("[3]", 'tres', content)
+    content = re.sub("[4]", 'quatro', content)
+    content = re.sub("[5]", 'cinco', content)
+    content = re.sub("[6]", 'seis', content)
+    content = re.sub("[7]", 'sete', content)
+    content = re.sub("[8]", 'oito', content)
+    content = re.sub("[9]", 'nove', content)
+    content = re.sub("[0]", 'zero', content)
 
     tokens = content
 
   if ngram_size > len(tokens):
-      return ''.join(tokens)
+      return set(''.join(tokens))
   
   return set([''.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)])
 
@@ -81,7 +91,7 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, 
       pathf = r.replace('\\','/')
       filename = pathf + '/' + file
 
-      d_author_name = pathf[pathf.rfind('/') +1:] + '/' + file
+      d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
       
       #-------------> Shingle
       #print(filename)
@@ -94,10 +104,11 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, 
         d_minhash[d_author_name].update(d.encode('utf8'))
 
       lsh.insert(d_author_name, d_minhash[d_author_name])
-
+      
       count = count + 1
-      if count > max_documents:
-        return d_shingles, d_minhash, lsh
+      if not (max_documents is None):
+        if count > max_documents:
+          return d_shingles, d_minhash, lsh
       
       #input("Press Enter to continue...")
 
