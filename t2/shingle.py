@@ -17,8 +17,6 @@ def CreateShingle(finput, ngram_size):
     #Concatenate each line and replace '\n' by ' '
     content = ''.join(content).replace('\n',' ').lower()
     
-    #TODO: Remove not used characters: é, ã, ê, ., ;, :, ...
-
     # ç
     content = re.sub("[ç]"   , 'c', content)  
     # â á à ã
