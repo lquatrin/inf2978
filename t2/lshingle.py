@@ -60,8 +60,8 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
     #trocar ' ' por '`' para facilitar o hash depois
     content = re.sub(' ', chr(96), content)
 	
-	tokens = content
-
+    tokens = content
+	
   #Get a slice: s[start:end], starts in 0
   #print(len(content))
   assert(len(content) >= ngram_size)
@@ -81,11 +81,17 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
 
   return ret_set 
 
+  
+def CalculateMinHash():
+	print("CalculateMinHash")
+
+
+  
 #To Calculate LSH similarity
 #sum([u==v for u,v in zip(a,b)])/len(a)
 
 #https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
-def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10):
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, lsh_threshold = 0.7):
   d_shingles = dict()
   d_minhash = dict()
 
@@ -94,7 +100,8 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10):
   #d_permutations = dict()
   #for i in range(hash_functions):
   #  d_permutations[i] = np.random.permutation(red_sequences)
-   
+  lsh = llsh.lLSH()  
+  
   n_count = 0
   for r,d,f in os.walk(path):
     for file in f:
@@ -103,21 +110,26 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10):
 
       d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
 	  
-	  fshingle = CreateShingle(filename, n_gram)
-	  
+      fshingle = CreateShingle(filename, n_gram)
+	  	  
       if fshingle is None:
         continue
 		
       d_shingles[d_author_name] = fshingle
-      
+      print(fshingle)
+	  
 	  #Fazer Minhash aqui
       #mhash = build_minhash(d_shingles, num_perm=hash_functions)
-      #to do -> insert key and hash to build lsh
+      CalculateMinHash()
+	  
+	  #to do -> insert key and hash to build lsh
       #lsh.insert(....)
+	  
+      input("Press Enter to continue...")
 
       n_count = n_count + 1
-	  if not (max_documents is None):
+      if not (max_documents is None):
         if n_count >= max_documents:
-          return d_shingles, d_minhash
+          return d_shingles, d_minhash, lsh
 
-  return d_shingles, d_names 
+  return d_shingles, d_names, lsh

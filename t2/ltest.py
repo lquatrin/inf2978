@@ -1,9 +1,9 @@
 import sys,os
 
-import shingle
+import lshingle
 
 root = ""
-#root = "F:/"
+root = "F:/"
 #root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
@@ -17,7 +17,7 @@ r_rows = 5
 b_bands = 10
 
 #Read Songs and Create Shingle sets
-d_shingles, d_minhash, lsh = shingle.ReadSongFiles(path, n_gram = n_shingle, max_documents = 5000, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold)
+d_shingles, d_minhash, lsh = lshingle.ReadSongFiles(path, n_gram = n_shingle, max_documents = 1000, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold)
 
 #LSH discutido em aula
 added_songs = dict()
