@@ -4,6 +4,7 @@ import msvcrt as m
 import sys,os
 
 import llsh
+import lminhash
 
 import re, time
 
@@ -78,23 +79,21 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
   return ret_set 
   
 def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
-  minhash = dict()
+  minhash = np.zeros(n_signatures)
   
   for i in range(n_signatures):
     for j in range(shingle_max_size):
       if permutations[i][j] in shingle:
         minhash[i] = j
-		
-  print(minhash)
   
   return minhash
-  
-#To Calculate LSH similarity
-#sum([u==v for u,v in zip(a,b)])/len(a)
-
+ 
 #https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
 def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, lsh_threshold = 0.7, shingle_max_size = None):
   assert(not shingle_max_size is None)
+  
+  d_times = dict()
+  d_times["data_creation"] = 0
   
   d_shingles = dict()
   d_minhash = dict()
@@ -105,12 +104,13 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
   for i in range(hash_signatures):
     d_permutations[i] = np.random.permutation(shingle_max_size)
 	
-  lsh = llsh.lLSH(hash_signatures)  
+  lsh = llsh.lLSH(hash_signatures, lsh_threshold)  
   
   n_count = 0
   for r,d,f in os.walk(path):
     for file in f:
       start = time.clock()
+
       pathf = r.replace('\\','/')
       filename = pathf + '/' + file
 
@@ -124,16 +124,15 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
       d_shingles[d_author_name] = fshingle
 	  
 	  # create minhash
-      f_minhash = CalculateMinHash(fshingle, hash_signatures, shingle_max_size, d_permutations)
-	  
+      d_minhash[d_author_name] = lminhash.lMinHash(CalculateMinHash(fshingle, hash_signatures, shingle_max_size, d_permutations))
+	  	  
 	  # insert key and hash to build lsh
-      lsh.Insert(d_author_name, f_minhash)
+      lsh.Insert(d_author_name, d_minhash[d_author_name])
 	  
-      print(str(time.clock() - start))
+      d_times["data_creation"] += time.clock() - start
 	  	  
       n_count = n_count + 1
       if not (max_documents is None):
         if n_count >= max_documents:
-          return d_shingles, d_minhash, lsh
-
-  return d_shingles, d_names, lsh
+          return d_shingles, d_minhash, lsh, d_times
+  return d_shingles, d_minhash, lsh, d_times

@@ -1,6 +1,6 @@
 import numpy as np
 import msvcrt as m
-import re, os
+import re, os, time
 from collections import defaultdict
 from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
@@ -75,17 +75,21 @@ def duplicates(lsh_index):
   return possible_duplicates
 
 
-def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, lsh_threshold = 0.9):
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, lsh_threshold = 0.9, shingle_max_size = None):
+  d_times = dict()
+  d_times["data_creation"] = 0
+
   d_shingles = dict()
   d_minhash = dict()
-
+  
   # https://ekzhu.github.io/datasketch/lsh.html
   lsh = MinHashLSH(threshold = lsh_threshold, num_perm = hash_signatures)
-
-
-  count = 0
+  
+  n_count = 0
   for r,d,f in os.walk(path):
     for file in f:
+      start = time.clock()
+	
       pathf = r.replace('\\','/')
       filename = pathf + '/' + file
 
@@ -106,12 +110,11 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, 
         d_minhash[d_author_name].update(d.encode('utf8'))
 
       lsh.insert(d_author_name, d_minhash[d_author_name])
-      
-      count = count + 1
+	  
+      d_times["data_creation"] += time.clock() - start
+	  
+      n_count = n_count + 1
       if not (max_documents is None):
-        if count > max_documents:
-          return d_shingles, d_minhash, lsh
-      
-      #input("Press Enter to continue...")
-
-  return d_shingles, d_minhash, lsh
+        if n_count > max_documents:
+          return d_shingles, d_minhash, lsh, d_times
+  return d_shingles, d_minhash, lsh, d_times
