@@ -12,6 +12,8 @@ from collections import defaultdict
 from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
 
+import sutils
+
 #http://www.bogotobogo.com/Algorithms/minHash_Jaccard_Similarity_Locality_sensitive_hashing_LSH.php
 #http://maciejkula.github.io/2015/02/01/minhash/
 #http://mccormickml.com/2015/06/12/minhash-tutorial-with-python-code/
@@ -30,34 +32,7 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
     #Concatenate each line and replace '\n' by ' '
     content = ''.join(content).replace('\n',' ').lower()
 
-    # ç
-    content = re.sub("[ç]"   , 'c', content)  
-    # â á à ã
-    content = re.sub("[âáàã]", 'a', content)
-    # ê é è
-    content = re.sub("[êéè]" , 'e', content)
-    # î í ì
-    content = re.sub("[îíì]" , 'i', content)
-    # ô ó ò õ
-    content = re.sub("[ôóòõ]", 'o', content)
-    # û ú ù
-    content = re.sub("[ûúù]" , 'u', content)
-
-    # ? ! ' . - " … : ; , [ ] ( ) { }
-    content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
-    
-    # 1 2 3 4 5 6 7 8 9 0
-    #content = re.sub("[1234567890]", ' ', content)
-    content = re.sub("[1]", 'um', content)
-    content = re.sub("[2]", 'dois', content)
-    content = re.sub("[3]", 'tres', content)
-    content = re.sub("[4]", 'quatro', content)
-    content = re.sub("[5]", 'cinco', content)
-    content = re.sub("[6]", 'seis', content)
-    content = re.sub("[7]", 'sete', content)
-    content = re.sub("[8]", 'oito', content)
-    content = re.sub("[9]", 'nove', content)
-    content = re.sub("[0]", 'zero', content)
+    content = sutils.FormatContent(content)
 
     #trocar ' ' por '`' para facilitar o hash depois
     content = re.sub(' ', chr(96), content)
