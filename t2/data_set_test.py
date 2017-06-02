@@ -1,8 +1,8 @@
 import sys,os
 
 ######################################
-# 'lshingle' para implementação manual
-# 'shingle' para implementação utiilizando a biblioteca datasketch
+# 'lshingle' para implementacao manual
+# 'shingle' para implementacao utiilizando a biblioteca datasketch
 import shingle as shinglegen
 
 root = ""

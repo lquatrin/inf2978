@@ -1,16 +1,11 @@
 import numpy as np
 import msvcrt as m
 
-import sys,os
-
-import llsh
-import lminhash
-
-import re, time
+import re, time, sys, os
 
 from collections import defaultdict
 from multiprocessing import Process
-from datasketch import MinHash, MinHashLSH
+import llsh, lminhash
 
 import sutils
 
@@ -20,14 +15,12 @@ def CreateShingle(filename, ngram_size, max_hash_val = None, list_coef = None):
   tokens = None
   with open(filename, "rb") as f:
     content = f.read().decode("UTF-8")
-
     if len(content) == 0:
       return None
 
     tokens = sutils.FormatContent(content)
     
   #Get a slice: s[start:end], starts in 0
-  #print(len(tokens))
   assert(len(tokens) >= ngram_size)
   
   ret_set = set()

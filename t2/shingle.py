@@ -1,6 +1,8 @@
 import numpy as np
 import msvcrt as m
-import re, os, time
+
+import re, time, sys, os
+
 from collections import defaultdict
 from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
@@ -12,7 +14,6 @@ def CreateShingle(finput, ngram_size):
   tokens = None
   with open(finput, "rb") as f:
     content = f.read().decode("UTF-8")
-
     if len(content) == 0:
       return None
     
