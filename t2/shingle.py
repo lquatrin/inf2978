@@ -16,12 +16,7 @@ def CreateShingle(finput, ngram_size):
     if len(content) == 0:
       return None
     
-    #Concatenate each line and replace '\n' by ' '
-    content = ''.join(content).replace('\n',' ').lower()
-    
-    content = sutils.FormatContent(content)
-
-    tokens = content
+    tokens = sutils.FormatContent(content)
 
   if ngram_size > len(tokens):
       return set(''.join(tokens))
@@ -50,7 +45,7 @@ def duplicates(lsh_index):
   return possible_duplicates
 
 
-def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, lsh_threshold = 0.9, shingle_max_size = None):
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 50, lsh_threshold = 0.9, shingle_max_size = None, alphabet = None):
   d_times = dict()
   d_times["data_creation"] = 0
 

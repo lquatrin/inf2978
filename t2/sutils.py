@@ -1,6 +1,10 @@
 import re
 
 def FormatContent(content):
+  
+  #Concatenate each line and replace '\n' by ' '
+  content = ''.join(content).replace('\n',' ').lower()
+
   # ç
   content = re.sub("[ç]"   , 'c', content)  
   # â á à ã
@@ -30,4 +34,15 @@ def FormatContent(content):
   content = re.sub("[9]", 'nove', content)
   content = re.sub("[0]", 'zero', content)
    
+  #trocar ' ' por '`' para facilitar o hash depois
+  content = re.sub(' ', chr(96), content)
+
   return content
+
+#links
+#https://docs.python.org/release/2.7.2/library/multiprocessing.html
+#http://scipy-cookbook.readthedocs.io/items/ParallelProgramming.html
+#http://sebastianraschka.com/Articles/2014_multiprocessing.html
+#http://www.parallelpython.com/
+#https://blog.dominodatalab.com/simple-parallelization/
+#http://dispy.sourceforge.net/

@@ -14,13 +14,8 @@ from datasketch import MinHash, MinHashLSH
 
 import sutils
 
-#http://www.bogotobogo.com/Algorithms/minHash_Jaccard_Similarity_Locality_sensitive_hashing_LSH.php
-#http://maciejkula.github.io/2015/02/01/minhash/
-#http://mccormickml.com/2015/06/12/minhash-tutorial-with-python-code/
-#https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
-
-#list_coef = [27**3, 27**2, 27**1, 27**0]
-def CreateShingle(filename, ngram_size, max_hash_val = None):
+def CreateShingle(filename, ngram_size, max_hash_val = None, list_coef = None):
+  assert(not list_coef is None)
 
   tokens = None
   with open(filename, "rb") as f:
@@ -28,22 +23,12 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
 
     if len(content) == 0:
       return None
+
+    tokens = sutils.FormatContent(content)
     
-    #Concatenate each line and replace '\n' by ' '
-    content = ''.join(content).replace('\n',' ').lower()
-
-    content = sutils.FormatContent(content)
-
-    #trocar ' ' por '`' para facilitar o hash depois
-    content = re.sub(' ', chr(96), content)
-	
-    tokens = content
-	
   #Get a slice: s[start:end], starts in 0
   #print(len(tokens))
   assert(len(tokens) >= ngram_size)
-
-  list_coef = [27**3, 27**2, 27**1, 27**0]
   
   ret_set = set()
   #[' '.join(tokens[i:i+ngram_size]) for i in range(0, len(tokens) - ngram_size + 1)]
@@ -53,6 +38,10 @@ def CreateShingle(filename, ngram_size, max_hash_val = None):
    
   return ret_set 
   
+#http://www.bogotobogo.com/Algorithms/minHash_Jaccard_Similarity_Locality_sensitive_hashing_LSH.php
+#http://maciejkula.github.io/2015/02/01/minhash/
+#http://mccormickml.com/2015/06/12/minhash-tutorial-with-python-code/
+#https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
 def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
   minhash = np.zeros(n_signatures)
   
@@ -64,8 +53,9 @@ def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
   return minhash
  
 #https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
-def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, lsh_threshold = 0.7, shingle_max_size = None):
+def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, lsh_threshold = 0.7, shingle_max_size = None, alphabet = None):
   assert(not shingle_max_size is None)
+  assert(not alphabet is None)
   
   d_times = dict()
   d_times["data_creation"] = 0
@@ -73,6 +63,13 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
   d_shingles = dict()
   d_minhash = dict()
 
+  # Gerando lista de coeficientes
+  list_coef = []
+  n_coef = shingle_max_size
+  for i in range(n_gram):
+    n_coef = n_coef / alphabet 
+    list_coef.append(n_coef)
+  
   ############# MinHash Permutations
   # Já Criar as permutações aqui para usar diretamente em cada doc
   d_permutations = dict()
@@ -91,7 +88,7 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
 
       d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
 	  
-      fshingle = CreateShingle(filename, n_gram, max_hash_val = shingle_max_size)
+      fshingle = CreateShingle(filename, n_gram, max_hash_val = shingle_max_size, list_coef = list_coef)
 	  	  
       if fshingle is None:
         continue
