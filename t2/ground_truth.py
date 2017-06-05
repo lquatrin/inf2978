@@ -42,13 +42,11 @@ def is_same_string(string_a, string_b, char_margin=5):
 
 
 def is_same_string_from_repo(website1_name, website2_name, string1, string2):
-    vagalume_website_name = 'vagalume.com.br'
+    vagalume_website_name = 'cifra-club'
 
     if website1_name != vagalume_website_name or website2_name != vagalume_website_name:
         return False
 
-    if string1 == string2 or string1 == string2 + " traducao" or string2 == string1 + " traducao":
-        return True
 
     return False
 
