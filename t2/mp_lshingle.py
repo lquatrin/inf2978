@@ -43,6 +43,7 @@ def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
     for j in range(shingle_max_size):
       if permutations[i][j] in shingle:
         minhash[i] = j
+        break
   
   return minhash
 
@@ -82,6 +83,7 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
     d_permutations[i] = np.random.permutation(shingle_max_size)
 	
   lsh = llsh.lLSH(hash_signatures, lsh_threshold)  
+  
   
   pool = Pool(multiprocessing.cpu_count())
   for r,d,f in os.walk(path):

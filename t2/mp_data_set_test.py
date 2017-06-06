@@ -6,7 +6,7 @@ import sys,os, time
 import mp_lshingle as shinglegen
 
 root = ""
-#root = "F:/"
+root = "F:/"
 #root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET2/")
@@ -16,7 +16,7 @@ path = os.path.join(root, "TRAIN_DATASET2/")
 if __name__ == '__main__':  
   #######################################
   # Parametros
-  n_shingle_gram = 3#4
+  n_shingle_gram = 4
   n_alphabet = 27 #alphabet(26) + white space(1)
   similarity_threshold = 0.8
   r_rows = 5
@@ -29,8 +29,9 @@ if __name__ == '__main__':
   #LoadPickleObject(pf_name):
 	
   start = time.clock()
-  print("Lendo arquivos de musica")
-  d_shingles, d_minhash, lsh, times = shinglegen.ReadSongFiles(path, n_gram = n_shingle_gram, max_documents = max_docs, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold, shingle_max_size = n_alphabet**n_shingle_gram, alphabet = n_alphabet)
+  
+  #print("Lendo arquivos de musica")
+  d_shingles, d_minhash, lsh, times = shinglegen.ReadSongFiles(path, n_gram = n_shingle_gram, max_documents = None, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold, shingle_max_size = n_alphabet**n_shingle_gram, alphabet = n_alphabet)
 
   print(time.clock() - start)
   #SavePickleObject(pf_name, s_obj):
