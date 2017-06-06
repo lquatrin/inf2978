@@ -42,6 +42,7 @@ def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
     for j in range(shingle_max_size):
       if permutations[i][j] in shingle:
         minhash[i] = j
+        break
   
   return minhash
  
