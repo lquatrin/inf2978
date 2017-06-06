@@ -1,6 +1,7 @@
 
 import re, time, sys, os
 import editdistance
+import pickle
 
 root = ""
 path = os.path.join(root, "TRAIN_DATASET/")
@@ -42,12 +43,15 @@ def is_same_string(string_a, string_b, char_margin=5):
 
 
 def is_same_string_from_repo(website1_name, website2_name, string1, string2):
-    vagalume_website_name = 'cifra-club'
+    
+    vagalume_website_name = 'vagalume'
 
     if website1_name != vagalume_website_name or website2_name != vagalume_website_name:
         return False
 
-
+    if string1 == string2 or string1 == string2 + " traducao" or string2 == string1 + " traducao":
+        return True
+        
     return False
 
 
@@ -115,6 +119,8 @@ def generate_matches(lyrics_tuple_list):
     return match_count, match_set
 
 def generate_ground_truth():
+  
+  pickle_ground_truth_output = "ground_truth.p"
   tuples = []
   n_count = 0;
   for r,d,f in os.walk(path):
@@ -134,7 +140,9 @@ def generate_ground_truth():
         print(tuples[0])
         break
   #TO DO - SAVE OCURRENCES
-  #count_true, matches = generate_count_true_and_matches(tuples)
+  count_true, matches = generate_count_true_and_matches(tuples)
+  with open(pickle_ground_truth_output, "wb") as file_out:
+        pickle.dump((count_true, matches), file_out)
   print("-------------------------------------")
   
   
