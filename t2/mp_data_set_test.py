@@ -7,9 +7,9 @@ import mp_lshingle as shinglegen
 
 root = ""
 #root = "F:/"
-root = "D:/inf2978t2dataset/"
+#root = "D:/inf2978t2dataset/"
 
-path = os.path.join(root, "TRAIN_DATASET/")
+path = os.path.join(root, "TRAIN_DATASET2/")
   
 #https://docs.python.org/2/library/multiprocessing.html
 #https://pymotw.com/2/multiprocessing/basics.html
@@ -21,11 +21,20 @@ if __name__ == '__main__':
   similarity_threshold = 0.8
   r_rows = 5
   b_bands = 10
+  max_docs = 100
   # tamanho de cada assinatura hash = r_band * b_band
-    
+   
+  #Adicionar Pickle
+
+  #LoadPickleObject(pf_name):
 	
+  start = time.clock()
   print("Lendo arquivos de musica")
-  d_shingles, d_minhash, lsh, times = shinglegen.ReadSongFiles(path, n_gram = n_shingle_gram, max_documents = 100, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold, shingle_max_size = n_alphabet**n_shingle_gram, alphabet = n_alphabet)
+  d_shingles, d_minhash, lsh, times = shinglegen.ReadSongFiles(path, n_gram = n_shingle_gram, max_documents = max_docs, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold, shingle_max_size = n_alphabet**n_shingle_gram, alphabet = n_alphabet)
+
+  print(time.clock() - start)
+  #SavePickleObject(pf_name, s_obj):
+
   
   # Criando o arquivo csv
   ret_file = open('resfile.csv','w')

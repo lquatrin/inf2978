@@ -20,7 +20,7 @@ def CreateShingle(filename, ngram_size, max_hash_val = None, list_coef = None):
       return None
 
     tokens = sutils.FormatContent(content)
-    
+  
   #Get a slice: s[start:end], starts in 0
   assert(len(tokens) >= ngram_size)
   
@@ -29,7 +29,7 @@ def CreateShingle(filename, ngram_size, max_hash_val = None, list_coef = None):
   for i in range(ngram_size, len(tokens)):
     #old ret_set.add(tokens[i-ngram_size:i])
     ret_set.add(sum([a*b for a,b in zip(list_coef, [ord(i)-96 for i in tokens[i-ngram_size:i]])]) % max_hash_val)
-   
+  
   return ret_set 
   
 #http://www.bogotobogo.com/Algorithms/minHash_Jaccard_Similarity_Locality_sensitive_hashing_LSH.php
@@ -46,26 +46,22 @@ def CalculateMinHash(shingle, n_signatures, shingle_max_size, permutations):
   
   return minhash
 
-def Rika():
-  print("Pao de Batata")
+#######################################################################################  
+def CreateMinhash(parameters):
+  fshingle = CreateShingle(parameters['fname'], parameters['ngram'], max_hash_val = parameters['smax'], list_coef = parameters['lcoef'])
   
-def fmp(x):
-  Rika()
-  # complicated processing
-  return [x, x + x**20 + x**10 - x**20 + x**10 - x**15 - x**15 - x**10]
-  
-y_size = 4
-y_parallel = list(range(y_size)) #dict
-def PrintResult(x):
-  for i in x:
-    y_parallel[i[0]] = i[1]
-  return
+  if fshingle is None:
+    return None
+
+  minhash = lminhash.lMinHash(CalculateMinHash(fshingle, parameters['hsig'], parameters['smax'], parameters['dperm']))
+
+  return [parameters['author'], fshingle, minhash]
   
 #https://stackoverflow.com/questions/14533420/can-you-suggest-a-good-minhash-implementation
 def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, lsh_threshold = 0.7, shingle_max_size = None, alphabet = None):
   assert(not shingle_max_size is None)
   assert(not alphabet is None)
-  
+    
   d_times = dict()
   d_times["data_creation"] = 0
   
@@ -87,61 +83,20 @@ def ReadSongFiles(path, n_gram = 4, max_documents = None, hash_signatures = 10, 
 	
   lsh = llsh.lLSH(hash_signatures, lsh_threshold)  
   
-  #################################################
   pool = Pool(multiprocessing.cpu_count())
-  y_serial = []
-  x = range(y_size)
-  
-  start = time.clock()
-  for i in x: y_serial += [fmp(i)[1]]
-  print(time.clock() - start)
-    
-  start = time.clock()
-  #y_parallel = pool.map(f, x) 
-  r = pool.map_async(fmp, x, callback=PrintResult)
-  r.wait()
-  print(time.clock() - start)  
-  
-  print(y_parallel == y_serial)
-  ##################################################
-  
-  n_count = 0
   for r,d,f in os.walk(path):
+    list_read = []
     for file in f:
-      print(file)
-      n_count += 1
-      if n_count <= 4:
-        break
-    if n_count <= 4:
-      break
-
-#  n_count = 0
-#  for r,d,f in os.walk(path):
-#    for file in f:
-#      start = time.clock()
-#
-#      pathf = r.replace('\\','/')
-#      filename = pathf + '/' + file
-#
-#      d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
-#	  
-#      fshingle = CreateShingle(filename, n_gram, max_hash_val = shingle_max_size, list_coef = list_coef)
-#	  	  
-#      if fshingle is None:
-#        continue
-#		
-#      d_shingles[d_author_name] = fshingle
-#	  
-#	  # create minhash
-#      d_minhash[d_author_name] = lminhash.lMinHash(CalculateMinHash(fshingle, hash_signatures, shingle_max_size, d_permutations))
-#	  	  
-#	  # insert key and hash to build lsh
-#      lsh.Insert(d_author_name, d_minhash[d_author_name])
-#	  
-#      d_times["data_creation"] += time.clock() - start
-#	  	  
-#      n_count = n_count + 1
-#      if not (max_documents is None):
-#        if n_count >= max_documents:
-#          return d_shingles, d_minhash, lsh, d_times
+      pathf = r.replace('\\','/')
+      filename = pathf + '/' + file
+      d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
+      
+      list_read.append({'fname' : filename, 'author' : d_author_name, 'ngram' : n_gram, 'hsig' : hash_signatures, 'smax' : shingle_max_size, 'lcoef' : list_coef, 'dperm' : d_permutations})
+	  
+    r = pool.map(CreateMinhash, list_read)
+    for res_ith in r:
+      lsh.Insert(res_ith[0], res_ith[2])
+      d_shingles[res_ith[0]] = res_ith[1]
+      d_minhash[res_ith[0]] = res_ith[2]
+  
   return d_shingles, d_minhash, lsh, d_times
