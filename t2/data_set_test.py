@@ -4,7 +4,7 @@ import shingle
 
 root = ""
 #root = "F:/"
-root = "D:/inf2978t2dataset/"
+#root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
 
@@ -23,7 +23,7 @@ def duplicates(lsh_index):
 # Parametros
 shingle_gram = 4
 number_of_signatures = 50
-max_docs = 1000 #None
+max_docs = None #1000
 
 d_results = serialization.LoadPickleObject('songdata')
 if d_results is None:

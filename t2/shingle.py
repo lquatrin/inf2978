@@ -1,12 +1,8 @@
-import numpy as np
 import msvcrt as m
+import sys, os
 
-import re, time, sys, os
-
-from collections import defaultdict
-from multiprocessing import Process
 from datasketch import MinHash, MinHashLSH
- 
+
 import sutils
  
 def CreateShingle(finput, ngram_size):
@@ -40,8 +36,6 @@ def ReadSongFiles(path, shingle_gram, hash_signatures, max_documents):
   n_count = 0
   for r,d,f in os.walk(path):
     for file in f:
-      start = time.clock()
-	
       pathf = r.replace('\\','/')
       filename = pathf + '/' + file
 
