@@ -1,9 +1,6 @@
 import sys, os, time
-
-######################################
-# 'lshingle' para implementacao manual
-# 'shingle' para implementacao utiilizando a biblioteca datasketch
-import shingle as shinglegen
+import serialization
+import shingle
 
 root = ""
 #root = "F:/"
@@ -25,21 +22,23 @@ def duplicates(lsh_index):
 #######################################
 # Parametros
 shingle_gram = 4
+number_of_signatures = 50
+max_docs = 1000 #None
+
+d_results = serialization.LoadPickleObject('songdata')
+if d_results is None:
+	start = time.clock()
+	# Creating minhashs
+	d_results = shingle.ReadSongFiles(path, shingle_gram, number_of_signatures, max_docs)
+	print("Read Songs", time.clock() - start)
+	serialization.SavePickleObject('songdata', d_results)
+
 similarity_threshold = 0.8
 rows = 5
 bands = 10
-max_docs = 100 #None
-# tamanho de cada assinatura hash = r_band * b_band
 
-
-
-start = time.clock()
-# Creating minhashs
-d_results = shinglegen.ReadSongFiles(path, shingle_gram, rows*bands, max_docs)
-print("Read Songs", time.clock() - start)
-
-
-
+assert(rows*bands == d_results['number_of_signatures'])	
+	
 start = time.clock()
 # https://github.com/ekzhu/datasketch
 # https://ekzhu.github.io/datasketch/lsh.html
