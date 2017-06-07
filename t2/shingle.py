@@ -64,6 +64,6 @@ def ReadSongFiles(path, shingle_gram, hash_signatures, max_documents):
       n_count = n_count + 1
       if not (max_documents is None):
         if n_count > max_documents:
-          return d_shingles, d_minhash
+          return {'shingle' : d_shingles, 'minhash' : d_minhash}
 
-  return d_shingles, d_minhash
+  return {'shingle' : d_shingles, 'minhash' : d_minhash}

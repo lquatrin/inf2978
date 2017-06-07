@@ -31,26 +31,32 @@ bands = 10
 max_docs = 100 #None
 # tamanho de cada assinatura hash = r_band * b_band
 
+
+
 start = time.clock()
 # Creating minhashs
-d_shingles, d_minhash = shinglegen.ReadSongFiles(path, shingle_gram, rows*bands, max_docs)
+d_results = shinglegen.ReadSongFiles(path, shingle_gram, rows*bands, max_docs)
 print("Read Songs", time.clock() - start)
+
+
 
 start = time.clock()
 # https://github.com/ekzhu/datasketch
 # https://ekzhu.github.io/datasketch/lsh.html
 # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
 lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
-for k,v in d_minhash.items():
+for k,v in d_results['minhash'].items():
   lsh.insert(k, v)
 print("Create LSH", time.clock() - start)
+
+
 
 # Criando o arquivo csv
 ret_file = open('resfile.csv','w')
 
 # Checar letras parecidas baseado no valor de 'similarity_threshold'
 added_songs = dict()
-for key, v_minhash in d_minhash.items():
+for key, v_minhash in d_results['minhash'].items():
   if not key in added_songs:
     result = lsh.query(v_minhash)
 
