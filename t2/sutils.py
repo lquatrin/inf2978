@@ -35,7 +35,7 @@ def FormatContent(content):
   content = re.sub("[0]", 'zero', content)
    
   #trocar ' ' por '`' para facilitar o hash depois
-  content = re.sub(' ', chr(96), content)
+  #content = re.sub(' ', chr(96), content)
 
   return content
 

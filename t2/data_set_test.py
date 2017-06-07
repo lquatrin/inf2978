@@ -1,4 +1,4 @@
-import sys,os
+import sys, os, time
 
 ######################################
 # 'lshingle' para implementacao manual
@@ -7,21 +7,43 @@ import shingle as shinglegen
 
 root = ""
 #root = "F:/"
-#root = "D:/inf2978t2dataset/"
+root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
 
+from datasketch import MinHash, MinHashLSH 
+def duplicates(lsh_index):
+
+  possible_duplicates = []
+  for bucket in lsh_index.hashtables:
+      for elem in bucket.values():
+          if len(elem) > 1:
+              possible_duplicates.append(elem)
+  
+  return possible_duplicates
+
 #######################################
 # Parametros
-n_shingle_gram = 3#4
-n_alphabet = 27 #alphabet(26) + white space(1)
+shingle_gram = 4
 similarity_threshold = 0.8
-r_rows = 5
-b_bands = 10
+rows = 5
+bands = 10
+max_docs = 100 #None
 # tamanho de cada assinatura hash = r_band * b_band
 
-# Ler arquivos de musica
-d_shingles, d_minhash, lsh, times = shinglegen.ReadSongFiles(path, n_gram = n_shingle_gram, max_documents = 100, hash_signatures = r_rows*b_bands, lsh_threshold = similarity_threshold, shingle_max_size = n_alphabet**n_shingle_gram, alphabet = n_alphabet)
+start = time.clock()
+# Creating minhashs
+d_shingles, d_minhash = shinglegen.ReadSongFiles(path, shingle_gram, rows*bands, max_docs)
+print("Read Songs", time.clock() - start)
+
+start = time.clock()
+# https://github.com/ekzhu/datasketch
+# https://ekzhu.github.io/datasketch/lsh.html
+# Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
+lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
+for k,v in d_minhash.items():
+  lsh.insert(k, v)
+print("Create LSH", time.clock() - start)
 
 # Criando o arquivo csv
 ret_file = open('resfile.csv','w')
