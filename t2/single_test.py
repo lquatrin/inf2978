@@ -19,7 +19,7 @@ bands = int(sys.argv[4])
 similarity_threshold = float(sys.argv[5])
 
 assert(rows*bands == number_of_signatures)	
-max_docs = None# 200
+max_docs = None # 200
 
 # https://github.com/ekzhu/datasketch
 # https://ekzhu.github.io/datasketch/lsh.html
@@ -48,7 +48,7 @@ if d_results is None:
 
 #########################
 # LSH
-assert(rows*bands == d_results['number_of_signatures'])	
+assert(rows*bands == number_of_signatures)	
 
 # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
 # Create LSH
