@@ -4,10 +4,12 @@ import shingle
 
 root = ""
 #root = "F:/"
-#root = "D:/inf2978t2dataset/"
+root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
 
+# https://github.com/ekzhu/datasketch
+# https://ekzhu.github.io/datasketch/lsh.html
 from datasketch import MinHash, MinHashLSH 
 def duplicates(lsh_index):
 
@@ -18,12 +20,12 @@ def duplicates(lsh_index):
               possible_duplicates.append(elem)
   
   return possible_duplicates
-  
+
 #######################################
 # Parametros
 shingle_gram = [3, 4, 5]
 number_of_signatures = [30, 40, 50, 60, 70, 100]
-max_docs = None #1000
+max_docs = 100
 
 for s_gram in shingle_gram:
   for n_sig in number_of_signatures:
@@ -34,46 +36,58 @@ for s_gram in shingle_gram:
       start = time.clock()
       d_results = shingle.ReadSongFiles(path, s_gram, n_sig, max_docs)
       d_results['creation_time'] = time.clock() - start
-	  
+
       print(str(s_gram) + '_' + str(n_sig) + ": " + str(d_results['creation_time']))
-	  
+
       serialization.SavePickleObject('songdata_' + str(s_gram) + '_' + str(n_sig), d_results)
 
 
+similarity_threshold = [0.7, 0.8, 0.9]
+d_r_b = dict()
+d_r_b[30]  = [(3, 10), (5, 6), (6, 5)]
+d_r_b[40]  = [(4, 10), (5, 8), (8, 5)]
+d_r_b[50]  = [(5, 10), (2, 25)]
+d_r_b[60]  = [(6, 10), (5, 12)]
+d_r_b[70]  = [(7, 10), (10, 7)]
+d_r_b[100] = [(5, 20), (10, 10), (20, 5), (4, 25), (25, 4)]
 
-#similarity_threshold = 0.8
-#rows = 5
-#bands = 10
-#
-#assert(rows*bands == d_results['number_of_signatures'])	
-#	
-#start = time.clock()
-## https://github.com/ekzhu/datasketch
-## https://ekzhu.github.io/datasketch/lsh.html
-## Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
-#lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
-#for k,v in d_results['minhash'].items():
-#  lsh.insert(k, v)
-#print("Create LSH", time.clock() - start)
-#
-#
-#
-## Criando o arquivo csv
-#ret_file = open('resfile.csv','w')
-#
-## Checar letras parecidas baseado no valor de 'similarity_threshold'
-#added_songs = dict()
-#for key, v_minhash in d_results['minhash'].items():
-#  if not key in added_songs:
-#    result = lsh.query(v_minhash)
-#
-#    for i in range(len(result)):
-#      added_songs[result[i]] = True
-#    
-#    if len(result) > 1:
-#      ret_file.write(';'.join(result))
-#      ret_file.write('\n')
-#      #input(str(len(result)) + ': ' + (';'.join(map(str,result))))
-#
-## Fechando arquivo CSV
-#ret_file.close()
+for s_gram in shingle_gram:
+  for hash_sig, signatures in d_r_b.items():
+    # Carrega dados de letras de musica
+    d_results = serialization.LoadPickleObject('songdata_' + str(s_gram) + '_' + str(hash_sig))
+    for rb in signatures:
+      rows = rb[0]
+      bands = rb[1]
+  
+      assert(rows*bands == d_results['number_of_signatures'])	
+  
+      for s_threshold in similarity_threshold:
+        start = time.clock()
+  
+  	
+        # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
+        lsh = MinHashLSH(threshold = s_threshold, num_perm = rows*bands, params = (rows, bands))
+        for k,v in d_results['minhash'].items():
+          lsh.insert(k, v)
+
+        print("Create LSH", time.clock() - start)
+        
+        # Criando o arquivo csv
+        ret_file = open('resfile_' + str(s_gram) + '_' + str(hash_sig) + '.csv','w')
+        
+        # Checar letras parecidas baseado no valor de 'similarity_threshold'
+        #added_songs = dict()
+        #for key, v_minhash in d_results['minhash'].items():
+        #  if not key in added_songs:
+        #    result = lsh.query(v_minhash)
+        #
+        #    for i in range(len(result)):
+        #      added_songs[result[i]] = True
+        #    
+        #    if len(result) > 1:
+        #      ret_file.write(';'.join(result))
+        #      ret_file.write('\n')
+        #      #input(str(len(result)) + ': ' + (';'.join(map(str,result))))
+        
+        # Fechando arquivo CSV
+        ret_file.close()
