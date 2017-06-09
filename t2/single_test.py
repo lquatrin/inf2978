@@ -4,7 +4,7 @@ import shingle
 
 root = ""
 #root = "F:/"
-root = "D:/inf2978t2dataset/"
+#root = "D:/inf2978t2dataset/"
 
 path = os.path.join(root, "TRAIN_DATASET/")
 
