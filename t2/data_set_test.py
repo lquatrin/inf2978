@@ -26,12 +26,12 @@ def duplicates(lsh_index):
 #######################
 shingle_gram = [3, 4, 5]
 number_of_signatures = [30, 40, 50, 60, 70, 100]
-max_docs = 1000
+max_docs = 200
 
 for s_gram in shingle_gram:
   for n_sig in number_of_signatures:
 
-    d_results = serialization.LoadPickleObject('songdata_' + str(s_gram) + '_' + str(n_sig))
+    d_results = serialization.LoadPickleObject('data/' + 'songdata_' + str(s_gram) + '_' + str(n_sig))
 
     if d_results is None:
       start = time.clock()
@@ -40,7 +40,7 @@ for s_gram in shingle_gram:
 
       print(str(s_gram) + '_' + str(n_sig) + ": " + str(d_results['creation_time']))
 
-      serialization.SavePickleObject('songdata_' + str(s_gram) + '_' + str(n_sig), d_results)
+      serialization.SavePickleObject('data/' + 'songdata_' + str(s_gram) + '_' + str(n_sig), d_results)
 
 
 ###################
@@ -59,7 +59,7 @@ d_r_b[100] = [(5, 20), (10, 10), (20, 5), (4, 25), (25, 4)]
 for s_gram in shingle_gram:
   for hash_sig, signatures in d_r_b.items():
     # Carrega dados de letras de musica
-    d_results = serialization.LoadPickleObject('songdata_' + str(s_gram) + '_' + str(hash_sig))
+    d_results = serialization.LoadPickleObject('data/' + 'songdata_' + str(s_gram) + '_' + str(hash_sig))
     for rb in signatures:
       rows = rb[0]
       bands = rb[1]
@@ -74,10 +74,11 @@ for s_gram in shingle_gram:
           lsh.insert(k, v)
         
         # Criando o arquivo csv
-        ret_file = open('resfile_' + str(s_gram) + '_' + str(hash_sig) + '.csv','w')
+        ret_file = open('data/' + 'resfile_' + str(s_gram) + '_' + str(hash_sig) + '_' + str(rows) + '_' + str(bands) + '_' + str(s_threshold).replace('.','') + '.csv','w')
         
         start = time.clock()
-        print("Gerando Duplicatas")
+        # Onde Imprimir?
+        #print("Gerando Duplicatas")
 
 		# Checar letras parecidas baseado no valor de 'similarity_threshold'
         added_songs = dict()
@@ -92,8 +93,8 @@ for s_gram in shingle_gram:
               ret_file.write(';'.join(result))
               ret_file.write('\n')
               #input(str(len(result)) + ': ' + (';'.join(map(str,result))))
-
-        print(time.clock() - start)
+        # Onde Imprimir?
+        #print(time.clock() - start)
         
         # Fechando arquivo CSV
         ret_file.close()

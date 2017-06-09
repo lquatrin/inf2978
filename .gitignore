@@ -225,4 +225,5 @@ cpp/cmake_install.cmake
 cpp/dataprojection.h
 cpp/pre_matrix_distance.txt
 *.pkl
+t2/data/*.csv
 t2/*.csv
