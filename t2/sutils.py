@@ -1,4 +1,8 @@
 import re
+import numpy as np
+import itertools
+from datasketch import MinHash, MinHashLSH
+
 
 def FormatContent(content):
   
@@ -38,6 +42,60 @@ def FormatContent(content):
   #content = re.sub(' ', chr(96), content)
 
   return content
+
+
+
+def get_possible_duplicates(lsh_index):
+  
+  if not lsh_index:
+    raise ValueError('Invalid LSH index.')
+
+  possible_duplicates = []
+  for bucket in lsh_index.hashtables:
+    for elem in bucket.values():
+      if len(elem) > 1:
+        possible_duplicates.append(elem)
+
+  return possible_duplicates
+
+
+
+def keypair(lsh_index_list):
+    
+  if not lsh_index_list or len(lsh_index_list) == 0:
+    raise ValueError('Invalid LSH index.')
+
+  key_set = set()
+  for sublist in lsh_index_list:
+    key_set |= set(itertools.combinations(sublist, 2))
+  
+  return key_set
+
+
+
+# Get the precision and recall
+def evalutation(lsh):
+
+  gt = set()
+  with open('ground_truth.p', 'rb') as test_gt_in:
+    gt = pickle.load(test_gt_in)
+  
+  lsh_key_dup = keypair(possible_duplicate(data))
+  num_matches_lsh = len(lsh_key_dup)
+  num_actual_matches = 0
+  match_set = gt[1]
+
+  for key_pair in lsh_key_dup:
+    if key_pair in match_set:
+        num_actual_matches += 1
+    if key_pair[::-1] in match_set:
+        num_actual_matches += 1
+
+  precision = (num_actual_matches // 2) / num_matches_lsh
+  recall = (num_actual_matches // 2) / gt[0]
+  
+  return precision,recall
+
 
 #links
 #https://docs.python.org/release/2.7.2/library/multiprocessing.html
