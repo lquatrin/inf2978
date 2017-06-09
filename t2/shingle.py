@@ -1,4 +1,3 @@
-import msvcrt as m
 import sys, os
 
 from datasketch import MinHash, MinHashLSH
