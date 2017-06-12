@@ -1,4 +1,4 @@
-import sys, os, time
+import sys, os, time, sutils
 import serialization
 import shingle
 from datasketch import MinHash, MinHashLSH 
@@ -67,7 +67,12 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
 #  
 #  lsh_time = time.clock() - lsh_time
 #  
-#  print("LSH: " + str(lsh_time))
+#  print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
+#  print(". Time: " + str(lsh_time))
+#
+#  precision, recall = sutils.evalutation(lsh)
+#  print(". Precision: " + precision)
+#  print(". Recall: " + recall)
 #  
 #  ret_file.close()
   ######################################
