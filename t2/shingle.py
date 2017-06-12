@@ -1,8 +1,9 @@
-import sys, os
+import sys, os, time
 
 from datasketch import MinHash, MinHashLSH
 
 import sutils
+import serialization
  
 def CreateShingle(finput, ngram_size):
 
@@ -28,11 +29,60 @@ def buildMinHash(shingle_list,num_perm=128):
           continue
   return mhash
 
-def ReadSongFiles(path, shingle_gram, hash_signatures, max_documents):
-  #d_shingles = dict()
+#--------------> Shingle
+# Create shingle for each song
+def BuildShingles(path, shingle_gram):
+  fn_time = time.clock()
+ 
+  shingles = dict()
+  for r,d,f in os.walk(path):
+    for file in f:
+      pathf = r.replace('\\','/')
+      filename = pathf + '/' + file
+  
+      d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
+
+      fshingle = CreateShingle(filename, shingle_gram)
+      if fshingle is None:
+        continue
+  
+      shingles[d_author_name] = fshingle
+      
+  fn_time = time.clock() - fn_time
+  return {'data' : shingles, 'time' : fn_time}
+
+#--------------> Minhash
+def BuildMinHashCollection(path, shingle_gram, hash_signatures):
   d_minhash = dict()
-    
-  #n_count = 0
+
+  # Descomentar linhas para serialização dos shingles
+  ############## Load Shingles  
+  d_shingles = serialization.LoadPickleObject('data/' + 'shingles_' + str(shingle_gram))
+  if d_shingles is None:
+    d_shingles = BuildShingles(path, shingle_gram)
+    serialization.SavePickleObject('data/' + 'shingles_' + str(shingle_gram), d_shingles)
+  ############## Load Shingles
+  
+  ############## MinHash
+  minhash_creation_time = time.clock()
+  
+  for author, fshingle in d_shingles['data'].items():
+    d_minhash[author] = MinHash(num_perm = hash_signatures)
+    for d in fshingle:
+      d_minhash[author].update(d.encode('utf8'))
+  
+  minhash_creation_time = (time.clock() -   minhash_creation_time) + d_shingles['time']
+  ############## MinHash
+  
+  return {'minhash' : d_minhash, 'time' : minhash_creation_time}
+
+  
+#--------------> Shingle + Minhash
+def ReadShingleAndBuildMinHash(path, shingle_gram, hash_signatures):
+  d_minhash = dict()
+  
+  minhash_creation_time = time.clock()
+  
   for r,d,f in os.walk(path):
     for file in f:
       pathf = r.replace('\\','/')
@@ -40,25 +90,18 @@ def ReadSongFiles(path, shingle_gram, hash_signatures, max_documents):
 
       d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
       
-      #-------------> Shingle
-      #print(filename)
+      #-------------> Read and Create Shingle
       fshingle = CreateShingle(filename, shingle_gram)
 
       if fshingle is None:
         continue
-      
-      #d_shingles[d_author_name] = fshingle
 
-      #-------------> MinHash
+      #-------------> Create MinHash
       d_minhash[d_author_name] = MinHash(num_perm = hash_signatures)
-      #for d in d_shingles[d_author_name]:
       for d in fshingle:
         d_minhash[d_author_name].update(d.encode('utf8'))
-	  
-      #n_count = n_count + 1
-      #if not (max_documents is None):
-      #  if n_count > max_documents:
-      #    return {'minhash' : d_minhash}
 
-  #{'shingle' : d_shingles, 'minhash' : d_minhash, 'number_of_signatures' : hash_signatures, 'n_gram' : shingle_gram}
-  return {'minhash' : d_minhash}
+  minhash_creation_time = (time.clock() -   minhash_creation_time)
+   
+  return {'minhash' : d_minhash, 'time' : minhash_creation_time}
+ 
