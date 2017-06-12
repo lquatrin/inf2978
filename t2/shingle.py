@@ -41,7 +41,8 @@ def BuildShingles(path, shingle_gram):
       filename = pathf + '/' + file
   
       d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
-
+      d_author_name = d_author_name.replace('/', '|')
+      
       fshingle = CreateShingle(filename, shingle_gram)
       if fshingle is None:
         continue
@@ -89,10 +90,10 @@ def ReadShingleAndBuildMinHash(path, shingle_gram, hash_signatures):
       filename = pathf + '/' + file
 
       d_author_name = pathf[pathf[:pathf.rfind('/')].rfind('/')+1:] + '/' + file
-      
+      d_author_name = d_author_name.replace('/', '|')
+	  
       #-------------> Read and Create Shingle
       fshingle = CreateShingle(filename, shingle_gram)
-
       if fshingle is None:
         continue
 

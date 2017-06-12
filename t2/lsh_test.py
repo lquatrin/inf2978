@@ -21,7 +21,6 @@ from datasketch import MinHash, MinHashLSH
 #  
 #  return possible_duplicates
 
-
 #######################
 # Parametros
 #######################
@@ -38,8 +37,7 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
   
     serialization.SavePickleObject('data/' + 'songdata_' + str(shingle_gram) + '_' + str(hash_of_signatures), d_songdata)
   ######################################
-  
-  
+    
   ######################################
   # LSH
   lsh_time = time.clock()
