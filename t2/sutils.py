@@ -27,16 +27,16 @@ def FormatContent(content):
   
   # 1 2 3 4 5 6 7 8 9 0
   #content = re.sub("[1234567890]", ' ', content)
-  content = re.sub("[1]", 'um', content)
-  content = re.sub("[2]", 'dois', content)
-  content = re.sub("[3]", 'tres', content)
-  content = re.sub("[4]", 'quatro', content)
-  content = re.sub("[5]", 'cinco', content)
-  content = re.sub("[6]", 'seis', content)
-  content = re.sub("[7]", 'sete', content)
-  content = re.sub("[8]", 'oito', content)
-  content = re.sub("[9]", 'nove', content)
-  content = re.sub("[0]", 'zero', content)
+  content = re.sub("[1]", '', content)
+  content = re.sub("[2]", '', content)
+  content = re.sub("[3]", '', content)
+  content = re.sub("[4]", '', content)
+  content = re.sub("[5]", '', content)
+  content = re.sub("[6]", '', content)
+  content = re.sub("[7]", '', content)
+  content = re.sub("[8]", '', content)
+  content = re.sub("[9]", '', content)
+  content = re.sub("[0]", '', content)
    
   #trocar ' ' por '`' para facilitar o hash depois
   #content = re.sub(' ', chr(96), content)
