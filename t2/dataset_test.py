@@ -10,14 +10,13 @@ path = os.path.join(root, "TRAIN_DATASET/")
 #######################
 # Parametros
 #######################
-shingle_gram = [3, 4, 5]
+shingle_gram = [4, 5]
 
 # baseado no 'number_of_signatures', gerar as configuracoes [30, 50, 75, 100]
 d_r_b = dict()
-d_r_b[30]  = [(3, 10), (5, 6), (6, 5)]
-d_r_b[50]  = [(5, 10), (2, 25)]
-d_r_b[75]  = [(7, 10), (10, 7)]
-d_r_b[100] = [(5, 20), (10, 10), (20, 5), (4, 25), (25, 4)]
+d_r_b[32]  = [(4, 8), (2, 16)]
+d_r_b[64]  = [(4, 16), (2, 32)]
+d_r_b[128] = [(8, 16), (4, 32), (2, 64)]
 
 similarity_threshold = [0.5, 0.6, 0.7, 0.8, 0.9]
 
