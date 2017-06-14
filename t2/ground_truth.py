@@ -110,7 +110,8 @@ def generate_ground_truth():
         pathf = r.replace('\\','/')
         filename = pathf + '/' + file
         data = r.split("/")
-        key = data[0] + "|" + data[1] + "|" + file
+        key = data[1] + "|" + data[2] + "|" + file
+        #print(key)
         #with open(filename, "rb") as fr:
         #  content = fr.read().decode("UTF-8")
         #t = (key,content)
