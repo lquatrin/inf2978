@@ -128,8 +128,7 @@ def ClassShingleAndBuildMinHash(path, shingle_gram, hash_signatures):
       d_author_name = int(file[2:file.find('.')])
       print(d_author_name)
 	  
-      
-      ##-------------> Read and Create Shingle
+      #-------------> Read and Create Shingle
       fshingle = CreateShingle(filename, shingle_gram)
       if fshingle is None:
         continue
