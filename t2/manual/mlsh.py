@@ -1,18 +1,20 @@
 import numpy as np
 import lminhash
 
-class lLSH:
-  def __init__(self, hash_signatures, threshold):
+class LSHMinHash:
+  def __init__(self, hash_signatures, threshold, params):
     self.data = []
     self.mhnames = []
     self.n_signatures = hash_signatures
     self.n_files = 0
     self.mh_threshold = threshold
+    self.r = params[0]
+    self.b = params[1]
 		
   def f(self):
     return 'hello world'
 		
-  def Insert(self, f_name, f_minhash):
+  def insert(self, f_name, f_minhash):
     self.mhnames.append(f_name)
     self.data.append(f_minhash)
     self.n_files += 1

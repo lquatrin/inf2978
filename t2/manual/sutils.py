@@ -76,10 +76,10 @@ def keypair(lsh_index_list):
 def evalutation(lsh):
 
   gt = set()
-  with open('ground_truth200k.p', 'rb') as test_gt_in:
+  with open('ground_truth.p', 'rb') as test_gt_in:
     gt = pickle.load(test_gt_in)
   
-  lsh_key_dup = keypair(get_possible_duplicate(lsh))
+  lsh_key_dup = keypair(possible_duplicate(lsh))
   num_matches_lsh = len(lsh_key_dup)
   num_actual_matches = 0
   match_set = gt[1]
