@@ -2,28 +2,17 @@
 import re, time, sys, os
 import editdistance
 import pickle
+import itertools
 
 root = ""
 path = os.path.join(root, "TRAIN_DATASET/")
+from multiprocessing import Pool
+
+NUM_PROCESSES = 4
 
 
-
-def is_same_string(string_a, string_b, char_margin=5):
-    """
-    Given two strings, this function returns True if they are identical within
-    a certain tolerance. This functions uses the edit distance to compare the
-    inputs.
-    Arguments:
-    string_a -- The first string
-    string_b -- The second string
-    char_margin -- The number or percentage of characters to use as margin. If
-    this parameter is float, it will be interpreted as a percentage of characters
-    of the smallest string. If is of type int, then it will be interpreted as the
-    number of characters of tolerance to declare that the two strings are the same.
-    Returns:
-    True if string_a matches string_b with at most "char_margin" different
-    characters. Also returns the distance between the two strings.
-    """
+def is_same_string(string_a, string_b, char_margin=3):
+   
     if not string_a or len(string_a) == 0:
         raise ValueError('Invalid input string.')
     if not string_b or len(string_b) == 0:
@@ -91,23 +80,15 @@ def check_match(key1, key2):
 
 
 def generate_matches(lyrics_tuple_list):
-    '''
-    Given a list of tuples in the form ('website|artist|songname', 'lyrics'),
-    this function searches through them and returns a dictionary containing the
-    matches and a counter of how many matches occured.
-    Arguments:
-    lyrics_tuple_list -- The list of tuples in the form:
-    [('website|artist|songname', 'lyrics'), ...)
-    Returns:
-    The number of matches and a set containing tuples of songs that matched, e.g.
-    set((key1, key2), (key2, key1), (key4, key3), (key3, key4), ...)
-    '''
+    
     if not lyrics_tuple_list or len(lyrics_tuple_list) == 0:
         raise ValueError('Invalid lyrics dictionary')
 
     match_count = 0
     match_set = set()
 
+    # combinations('ABCD', 2) --> AB AC AD BC BD CD
+    
     for key1, key2 in itertools.combinations(lyrics_tuple_list, 2):
         if (key1, key2) not in match_set:
             is_match = check_match(key1, key2)
@@ -115,35 +96,49 @@ def generate_matches(lyrics_tuple_list):
                 match_set.add((key1, key2))
                 match_set.add((key2, key1))
                 match_count += 1
+        
 
     return match_count, match_set
 
 def generate_ground_truth():
   
-  pickle_ground_truth_output = "ground_truth.p"
+  pickle_ground_truth_output = "ground_truth_4.p"
   tuples = []
   n_count = 0;
   for r,d,f in os.walk(path):
       for file in f:
         pathf = r.replace('\\','/')
         filename = pathf + '/' + file
-        data = r.split("\\")
+        data = r.split("/")
         key = data[0] + "|" + data[1] + "|" + file
-        with open(filename, "rb") as fr:
-          content = fr.read().decode("UTF-8")
-        t = (key,content)
-        print("-------------------------------------")
-        tuples.append(t)
+        #with open(filename, "rb") as fr:
+        #  content = fr.read().decode("UTF-8")
+        #t = (key,content)
+        tuples.append(key)
         n_count = n_count + 1
-      # Remove - just for testing 
-      if n_count > 100:
-        print(tuples[0])
-        break
-  #TO DO - SAVE OCURRENCES
-  count_true, matches = generate_count_true_and_matches(tuples)
+  
+  start = time.time()
+  print(' Generating Combinations with {} '.format(NUM_PROCESSES))
+  tuple_size = int(len(tuples) / NUM_PROCESSES)
+  dict_chunks = [tuples[i:i + tuple_size] for i in range(0, len(tuples), tuple_size)]
+  print('Split the data into {} chunks of {} elements.'.format(NUM_PROCESSES, tuple_size))
+  print("------------ generating pickle matches ---------------")
+  pool = Pool(processes=NUM_PROCESSES)
+  results = pool.map(generate_matches, dict_chunks)
+  print('DONE!')
+
+  count_true = sum(r[0] for r in results)
+  matches = set.union(*(s[1] for s in results))
+  
+  print('Number of matches found = {}'.format(count_true))
+  
+  now = time.time() - start
+  print("finished! minutes: ",now/60)
+  #count_true, matches = generate_matches(tuples)
+  
   with open(pickle_ground_truth_output, "wb") as file_out:
         pickle.dump((count_true, matches), file_out)
-  print("-------------------------------------")
+  print("------------------------------------------------------")
   
   
 generate_ground_truth()
