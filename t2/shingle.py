@@ -110,4 +110,36 @@ def ReadShingleAndBuildMinHash(path, shingle_gram, hash_signatures):
   minhash_creation_time = (time.clock() -   minhash_creation_time)
    
   return {'minhash' : d_minhash, 'time' : minhash_creation_time, 'permutations' : r_permutations}
+  
+def ClassShingleAndBuildMinHash(path, shingle_gram, hash_signatures):
+  d_minhash = dict()
+  
+  minhash_creation_time = time.clock()
+  
+  generator = np.random.RandomState(1)
+  mersenne_prime = (1 << 61) - 1
+  r_permutations = np.array([(generator.randint(1, mersenne_prime, dtype=np.uint64), generator.randint(0, mersenne_prime, dtype=np.uint64)) for _ in range(hash_signatures)], dtype=np.uint64).T
+  
+  for r,d,f in os.walk(path):
+    for file in f:
+      pathf = r.replace('\\','/')
+      filename = pathf + '/' + file
+	  
+      d_author_name = int(file[2:file.find('.')])
+      print(d_author_name)
+	  
+      
+      ##-------------> Read and Create Shingle
+      fshingle = CreateShingle(filename, shingle_gram)
+      if fshingle is None:
+        continue
+      
+      #-------------> Create MinHash
+      d_minhash[d_author_name] = MinHash(num_perm = hash_signatures, permutations = r_permutations)
+      for d in fshingle:
+        d_minhash[d_author_name].update(d.encode('utf8'))
+
+  minhash_creation_time = (time.clock() -   minhash_creation_time)
+   
+  return {'minhash' : d_minhash, 'time' : minhash_creation_time, 'permutations' : r_permutations}
  
