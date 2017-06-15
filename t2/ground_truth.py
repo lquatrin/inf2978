@@ -8,7 +8,7 @@ root = ""
 path = os.path.join(root, "TRAIN_DATASET/")
 from multiprocessing import Pool
 
-NUM_PROCESSES = 4
+NUM_PROCESSES = 2
 
 
 def is_same_string(string_a, string_b, char_margin=3):
@@ -102,7 +102,7 @@ def generate_matches(lyrics_tuple_list):
 
 def generate_ground_truth():
   
-  pickle_ground_truth_output = "ground_truth_4.p"
+  pickle_ground_truth_output = "ground_truth_2.p"
   tuples = []
   n_count = 0;
   for r,d,f in os.walk(path):
