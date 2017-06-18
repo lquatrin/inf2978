@@ -27,6 +27,7 @@ from datasketch import MinHash, MinHashLSH
 def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_threshold):
   assert(rows*bands == hash_of_signatures)	
 
+  print("starting")
   ######################################
   # MinHash
   d_songdata = serialization.LoadPickleObject('data/' + 'songdata_' + str(shingle_gram) + '_' + str(hash_of_signatures))
@@ -49,7 +50,16 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
     lsh.insert(k, v)
   
   # Criando o arquivo csv
-  ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '.csv','w')
+  lsh_time = time.clock() - lsh_time
+  
+  print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
+  print(". Time: " + str(lsh_time))
+  
+  precision, recall = sutils.evalutation(lsh)
+  print(". Precision: {}".format(precision))
+  print(". Recall: {}".format(recall))
+  
+  ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '_' + str(precision) + '_' + str(recall) + '.csv','w')
   
   # Checar letras parecidas baseado no valor de 'similarity_threshold'
   added_songs = dict()
@@ -65,14 +75,6 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
         ret_file.write('\n')
         #input(str(len(result)) + ': ' + (';'.join(map(str,result))))
   
-  lsh_time = time.clock() - lsh_time
-  
-  print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
-  print(". Time: " + str(lsh_time))
-  
-  precision, recall = sutils.evalutation(lsh)
-  print(". Precision: {}".format(precision))
-  print(". Recall: {}".format(recall))
-  
+ 
   ret_file.close()
   ######################################
