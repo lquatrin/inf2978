@@ -56,7 +56,10 @@ for key, v_minhash in d_songdata['minhash'].items():
           added_songs[(key, s_ret)] = True
           if v_minhash.jaccard(d_songdata['minhash'][s_ret]) >= similarity_threshold:
             g_sel = g_sel + 1
-            ret_file.write(str(key) + ';' + str(s_ret))
+            if key < s_ret:
+              ret_file.write(str(key) + ';' + str(s_ret))
+            else:
+              ret_file.write(str(s_ret) + ';' + str(key))
             ret_file.write('\n')
 
 # Criando o arquivo csv
