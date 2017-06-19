@@ -4,6 +4,7 @@ import shingle
 from datasketch import MinHash, MinHashLSH 
 
 path = str(sys.argv[1])
+#"D:/inf2978t2dataset/TRAIN_DATASET4" 
 
 #######################
 # Parametros [a ser definido apos testes]
@@ -21,7 +22,7 @@ assert(rows*bands == hash_of_signatures)
 d_songdata = shingle.ClassShingleAndBuildMinHash(path, shingle_gram, hash_of_signatures)
 print(str(shingle_gram) + '_' + str(hash_of_signatures) + ": " + str(d_songdata['time']))
 ######################################
-    
+
 ######################################
 # LSH
 lsh_time = time.clock()
@@ -32,27 +33,38 @@ lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params
 for k,v in d_songdata['minhash'].items():
   lsh.insert(k, v)
   
-# Criando o arquivo csv
-ret_file = open('resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '.csv','w')
-
-# Checar letras parecidas baseado no valor de 'similarity_threshold'
-added_songs = dict()
-for key, v_minhash in d_songdata['minhash'].items():
-  if not key in added_songs:
-    result = lsh.query(v_minhash)
-
-    for i in range(len(result)):
-      added_songs[result[i]] = True
-    
-    if len(result) > 1:
-      ret_file.write(';'.join([str(x) for x in result]))
-      ret_file.write('\n')
-      #input(str(len(result)) + ': ' + (';'.join(map(str,result))))
-
-lsh_time = time.clock() - lsh_time
+#precision, recall = sutils.evalutation(lsh)
+#print(". Precision: {}".format(precision))
+#print(". Recall: {}".format(recall))
+#ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '_' + str(precision) + '_' + str(recall) + '.csv','w')
+ 
+ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '.csv','w')
   
+# Checar letras parecidas baseado no valor de 'similarity_threshold'
+g_sel = 0
+g_total = 0
+added_songs = dict()
+
+for key, v_minhash in d_songdata['minhash'].items():
+  result = lsh.query(v_minhash)
+
+  if len(result) > 1:
+    for s_ret in result:
+      if s_ret is not key:
+        if not (((key,s_ret) in added_songs) or ((s_ret,key) in added_songs)):
+          g_total = g_total + 1
+          added_songs[(key, s_ret)] = True
+          if v_minhash.jaccard(d_songdata['minhash'][s_ret]) >= similarity_threshold:
+            g_sel = g_sel + 1
+            ret_file.write(str(key) + ';' + str(s_ret))
+            ret_file.write('\n')
+
+# Criando o arquivo csv
+lsh_time = time.clock() - lsh_time
+
 print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
 print(". Time: " + str(lsh_time))
-  
+print(". LSH Precision: " + str((g_sel / g_total) * 100) + " %" + " [" + str(g_total) + ", " + str(g_sel) + "]")
+
 ret_file.close()
 ######################################
