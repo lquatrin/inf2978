@@ -62,6 +62,8 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
   ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '_' + str(precision) + '_' + str(recall) + '.csv','w')
   
   # Checar letras parecidas baseado no valor de 'similarity_threshold'
+  g_sel = 0
+  g_total = 0
   added_songs = dict()
   for key, v_minhash in d_songdata['minhash'].items():
     result = lsh.query(v_minhash)
@@ -70,11 +72,14 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
       for s_ret in result:
         if s_ret is not key:
           if not (((key,s_ret) in added_songs) or ((s_ret,key) in added_songs)):
+            g_total = g_total + 1
             added_songs[(key, s_ret)] = True
-            ret_file.write(key + ';' + s_ret)
-            ret_file.write('\n')
+            if v_minhash.jaccard(d_songdata['minhash'][s_ret]) >= similarity_threshold:
+              g_sel = g_sel + 1
+              ret_file.write(key + ';' + s_ret)
+              ret_file.write('\n')
   
-    #print(". Precision: {}".format(precision))
+  print(". LSH Precision: " + str((g_sel / g_total) * 100) + " %" + " [" + str(g_total) + ", " + str(g_sel) + "]")
  
   ret_file.close()
   ######################################
