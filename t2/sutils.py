@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 import re
 import numpy as np
 import itertools
@@ -10,7 +12,8 @@ def FormatContent(content, manual_mode = False):
   #Concatenate each line and replace '\n' by ' '
   content = ''.join(content).replace('\n',' ').lower()
 
-  # ç
+
+  # c
   content = re.sub("[ç]"   , 'c', content)  
   # â á à ã
   content = re.sub("[âáàã]", 'a', content)
@@ -39,6 +42,8 @@ def FormatContent(content, manual_mode = False):
   content = re.sub("[9]", '', content)
   content = re.sub("[0]", '', content)
    
+  content = re.sub(' *', ' ', content)
+
   #trocar ' ' por '`' para facilitar o hash depois
   if manual_mode == True:
     content = re.sub(' ', chr(96), content)
@@ -76,8 +81,11 @@ def keypair(lsh_index_list):
 # Get the precision and recall
 def evalutation(lsh):
 
+   
+  ret_file = open('not_founded.txt,'ab')
+
   gt = set()
-  with open('ground_truth_4.p', 'rb') as test_gt_in:
+  with open('ground_truth_2.p', 'rb') as test_gt_in:
     gt = pickle.load(test_gt_in)
   
   lsh_key_dup = keypair(get_possible_duplicates(lsh))
@@ -92,9 +100,12 @@ def evalutation(lsh):
     #print(key_pair)
     if key_pair in match_set:
         num_actual_matches += 1
-    if key_pair[::-1] in match_set:
+    elif key_pair[::-1] in match_set:
         num_actual_matches += 1
-
+    else:
+       ret_file.write(key_pair)
+  
+  ret_file.close()
   precision = (num_actual_matches // 2) / num_matches_lsh
   recall = (num_actual_matches // 2) / gt[0]
   

@@ -44,6 +44,8 @@ def is_same_string_from_repo(website1_name, website2_name, string1, string2):
     return False
 
 
+
+
 def check_match(key1, key2):
 # 'key[12]' is a string with the following:
 # 'website_name|artist_name|lyrics_name'
@@ -51,14 +53,14 @@ def check_match(key1, key2):
     key1_split = key1.split('|')
     key2_split = key2.split('|')
 
-    if not len(key1_split) == 3:
+    if not len(key1_split) == 4:
         print('Original key:{}\nSplit key:{}'.format(key1, key1_split))
         assert False
-    assert len(key2_split) == 3
+    assert len(key2_split) == 4
 
     try:
         # Checks whether artist name is the same
-        is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 1)
+        is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 3)
         if not is_same_artist_name:
             return False
 
@@ -68,9 +70,13 @@ def check_match(key1, key2):
                                                                     key2_split[2])
 
         # Checks whether lyrics name is the same
-        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 1)
+        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
+        
         if not is_same_lyrics_name and not is_same_lyrics_from_repo:
-            return False
+            if is_same_string(key1_split[3],key2_split[3],3):
+              return True
+            else:
+              return False
 
     except Exception:
         print("Error comparing '%s' and '%s'. Returning False for matching." % (key1, key2))
@@ -112,9 +118,11 @@ def generate_ground_truth():
         data = r.split("/")
         key = data[1] + "|" + data[2] + "|" + file
         #print(key)
-        #with open(filename, "rb") as fr:
-        #  content = fr.read().decode("UTF-8")
+        with open(filename, "rb") as fr:
+          content = fr.read().decode("UTF-8")
+        key = key + "|" + content
         #t = (key,content)
+        print(key)
         tuples.append(key)
         n_count = n_count + 1
   
