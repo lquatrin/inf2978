@@ -82,9 +82,12 @@ def keypair(lsh_index_list):
 def evalutation(lsh):
 
    
-  ret_file = open('not_founded.txt,'ab')
+  
 
   gt = set()
+  not_founded = []
+
+
   with open('ground_truth_2.p', 'rb') as test_gt_in:
     gt = pickle.load(test_gt_in)
   
@@ -94,21 +97,25 @@ def evalutation(lsh):
   num_actual_matches = 0
   match_set = gt[1]
 
-  print(match_set)
   #print(lsh_key_dup)
   for key_pair in lsh_key_dup:
     #print(key_pair)
     if key_pair in match_set:
         num_actual_matches += 1
-    elif key_pair[::-1] in match_set:
+    if key_pair[::-1] in match_set:
         num_actual_matches += 1
-    else:
-       ret_file.write(key_pair)
+    if not key_pair in match_set or not key_pair[::-1] in match_set:
+       not_founded.append(key_pair)
+
   
-  ret_file.close()
   precision = (num_actual_matches // 2) / num_matches_lsh
   recall = (num_actual_matches // 2) / gt[0]
   
+  with open('not_founded.p', "wb") as file_out:
+        pickle.dump(not_founded, file_out)
+  print("------------------------------------------------------")
+  
+
   return precision,recall
 
 

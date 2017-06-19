@@ -53,10 +53,10 @@ def check_match(key1, key2):
     key1_split = key1.split('|')
     key2_split = key2.split('|')
 
-    if not len(key1_split) == 4:
+    if not len(key1_split) >= 4:
         print('Original key:{}\nSplit key:{}'.format(key1, key1_split))
         assert False
-    assert len(key2_split) == 4
+    assert len(key2_split) >= 4
 
     try:
         # Checks whether artist name is the same
@@ -122,7 +122,6 @@ def generate_ground_truth():
           content = fr.read().decode("UTF-8")
         key = key + "|" + content
         #t = (key,content)
-        print(key)
         tuples.append(key)
         n_count = n_count + 1
   
