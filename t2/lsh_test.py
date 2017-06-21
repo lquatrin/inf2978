@@ -80,6 +80,10 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
               ret_file.write('\n')
   
   print(". LSH Precision: " + str((g_sel / g_total) * 100) + " %" + " [" + str(g_total) + ", " + str(g_sel) + "]")
- 
+
+  ret_file.close()
+  
+  ret_file = open('tests_results.csv','a')
+  ret_file.write(str(shingle_gram) + ';' + str(hash_of_signatures) + ';' + str(rows) + ';' + str(bands) + '; 0.' + str(similarity_threshold) + ';' + str(precision) + ';' + str(recall) + ';' + str((g_sel / g_total) * 100));
   ret_file.close()
   ######################################

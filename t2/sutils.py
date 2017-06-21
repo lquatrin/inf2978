@@ -88,7 +88,7 @@ def evalutation(lsh):
   not_founded = []
 
 
-  with open('ground_truth_2.p', 'rb') as test_gt_in:
+  with open('ground_truth_4.p', 'rb') as test_gt_in:
     gt = pickle.load(test_gt_in)
   
   lsh_key_dup = keypair(get_possible_duplicates(lsh))
@@ -103,13 +103,15 @@ def evalutation(lsh):
     if key_pair in match_set:
         num_actual_matches += 1
     if key_pair[::-1] in match_set:
-        num_actual_matches += 1
-    if not key_pair in match_set or not key_pair[::-1] in match_set:
+       num_actual_matches += 1
+    if not key_pair in match_set and not key_pair[::-1] in match_set:
+       print(key_pair)
        not_founded.append(key_pair)
 
   
   precision = (num_actual_matches // 2) / num_matches_lsh
   recall = (num_actual_matches // 2) / gt[0]
+  
   
   with open('not_founded.p', "wb") as file_out:
         pickle.dump(not_founded, file_out)

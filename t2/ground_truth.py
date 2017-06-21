@@ -8,7 +8,7 @@ root = ""
 path = os.path.join(root, "TRAIN_DATASET/")
 from multiprocessing import Pool
 
-NUM_PROCESSES = 2
+NUM_PROCESSES = 1
 
 
 def is_same_string(string_a, string_b, char_margin=3):
@@ -17,9 +17,9 @@ def is_same_string(string_a, string_b, char_margin=3):
         raise ValueError('Invalid input string.')
     if not string_b or len(string_b) == 0:
         raise ValueError('Invalid input string.')
-    if isinstance(char_margin, int):
-        if len(string_a) < char_margin or len(string_b) < char_margin:
-            raise ValueError('Input strings shorter than tolerance margin.')
+    #if isinstance(char_margin, int):
+    #    if len(string_a) < char_margin or len(string_b) < char_margin:
+    #        raise ValueError('Input strings shorter than tolerance margin.')
 
     d = editdistance.eval(string_a, string_b)
 
@@ -44,19 +44,17 @@ def is_same_string_from_repo(website1_name, website2_name, string1, string2):
     return False
 
 
-
-
 def check_match(key1, key2):
 # 'key[12]' is a string with the following:
 # 'website_name|artist_name|lyrics_name'
 
-    key1_split = key1.split('|')
-    key2_split = key2.split('|')
+    key1_split = key1[0].split('|')
+    key2_split = key2[0].split('|')
 
-    if not len(key1_split) >= 4:
+    if not len(key1_split) == 3:
         print('Original key:{}\nSplit key:{}'.format(key1, key1_split))
         assert False
-    assert len(key2_split) >= 4
+    assert len(key2_split) == 3
 
     try:
         # Checks whether artist name is the same
@@ -71,12 +69,12 @@ def check_match(key1, key2):
 
         # Checks whether lyrics name is the same
         is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
-        
         if not is_same_lyrics_name and not is_same_lyrics_from_repo:
-            if is_same_string(key1_split[3],key2_split[3],3):
-              return True
+            same_lyrics = is_same_string(key1[1],key2[1],5)
+            if same_lyrics :
+               return True     
             else:
-              return False
+               return False
 
     except Exception:
         print("Error comparing '%s' and '%s'. Returning False for matching." % (key1, key2))
@@ -108,7 +106,7 @@ def generate_matches(lyrics_tuple_list):
 
 def generate_ground_truth():
   
-  pickle_ground_truth_output = "ground_truth_2.p"
+  pickle_ground_truth_output = "ground_truth_seq_total.p"
   tuples = []
   n_count = 0;
   for r,d,f in os.walk(path):
@@ -120,9 +118,8 @@ def generate_ground_truth():
         #print(key)
         with open(filename, "rb") as fr:
           content = fr.read().decode("UTF-8")
-        key = key + "|" + content
-        #t = (key,content)
-        tuples.append(key)
+        t = (key,content)
+        tuples.append(t)
         n_count = n_count + 1
   
   start = time.time()

@@ -17,9 +17,6 @@ def is_same_string(string_a, string_b, char_margin=3):
         raise ValueError('Invalid input string.')
     if not string_b or len(string_b) == 0:
         raise ValueError('Invalid input string.')
-    if isinstance(char_margin, int):
-        if len(string_a) < char_margin or len(string_b) < char_margin:
-            raise ValueError('Input strings shorter than tolerance margin.')
 
     d = editdistance.eval(string_a, string_b)
 
@@ -58,7 +55,7 @@ def check_match(key1, key2):
 
     try:
         # Checks whether artist name is the same
-        is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 1)
+        is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 4)
         if not is_same_artist_name:
             return False
 
@@ -68,7 +65,7 @@ def check_match(key1, key2):
                                                                     key2_split[2])
 
         # Checks whether lyrics name is the same
-        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 1)
+        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 4)
         if not is_same_lyrics_name and not is_same_lyrics_from_repo:
             return False
 
@@ -102,9 +99,10 @@ def generate_matches(lyrics_tuple_list):
 
 def generate_ground_truth():
   
-  pickle_ground_truth_output = "ground_truth_4.p"
+  pickle_ground_truth_output = "ground_truth_amostragem.p"
   tuples = []
   n_count = 0;
+  
   for r,d,f in os.walk(path):
       for file in f:
         pathf = r.replace('\\','/')
@@ -117,6 +115,8 @@ def generate_ground_truth():
         #t = (key,content)
         tuples.append(key)
         n_count = n_count + 1
+      if n_count > 200000:
+        break
   
   start = time.time()
   print('Split the data into {} chunks of {} elements.'.format(NUM_PROCESSES, len(tuples)))
