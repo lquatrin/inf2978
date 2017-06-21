@@ -103,9 +103,14 @@ def evalutation(lsh):
     if key_pair in match_set:
         num_actual_matches += 1
     if key_pair[::-1] in match_set:
+<<<<<<< HEAD
        num_actual_matches += 1
     if not key_pair in match_set and not key_pair[::-1] in match_set:
        print(key_pair)
+=======
+        num_actual_matches += 1
+    if not key_pair in match_set and not key_pair[::-1] in match_set:
+>>>>>>> 03edc46db5966ea3fff4ee295d63ebfd5313a799
        not_founded.append(key_pair)
 
   
