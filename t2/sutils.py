@@ -104,7 +104,7 @@ def evalutation(lsh):
         num_actual_matches += 1
     if key_pair[::-1] in match_set:
         num_actual_matches += 1
-    if not key_pair in match_set or not key_pair[::-1] in match_set:
+    if not key_pair in match_set and not key_pair[::-1] in match_set:
        not_founded.append(key_pair)
 
   
