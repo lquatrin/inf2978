@@ -97,8 +97,8 @@ def generate_matches(lyrics_tuple_list):
         if (key1, key2) not in match_set:
             is_match = check_match(key1, key2)
             if is_match:
-                match_set.add((key1, key2))
-                match_set.add((key2, key1))
+                match_set.add((key1[0], key2[0]))
+                match_set.add((key2[0], key1[0]))
                 match_count += 1
         
 
