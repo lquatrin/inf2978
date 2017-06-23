@@ -41,8 +41,9 @@ def FormatContent(content, manual_mode = False):
   content = re.sub("[8]", '', content)
   content = re.sub("[9]", '', content)
   content = re.sub("[0]", '', content)
-   
-  content = re.sub(' *', ' ', content)
+  
+  content = ' '.join(content.split())
+  #content = re.sub(' *', ' ', content)
 
   #trocar ' ' por '`' para facilitar o hash depois
   if manual_mode == True:
