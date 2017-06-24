@@ -51,7 +51,7 @@ def check_match(key1, key2):
 
     key1_split = key1[0].split('|')
     key2_split = key2[0].split('|')
-
+	
     if not len(key1_split) == 3:
         print('Original key:{}\nSplit key:{}'.format(key1, key1_split))
         assert False
@@ -75,7 +75,7 @@ def check_match(key1, key2):
             split_content_1 = key1[1].split()
             split_content_2 = key2[1].split()
 			
-            if (len(split_content_1) == 1 and str.lower(split_content_1) == str.lower('Instrumental')) or (len(split_content_2) == 1 and str.lower(split_content_2) == str.lower('Instrumental')):
+            if (len(split_content_1) == 1 and str.lower(split_content_1[0]) == str.lower('Instrumental')) or (len(split_content_2) == 1 and str.lower(split_content_2[0]) == str.lower('Instrumental')):
               return False
 
             same_lyrics, _ = is_same_string(key1[1], key2[1], 50)
@@ -123,7 +123,10 @@ def generate_ground_truth():
         filename = pathf + '/' + file
         data = r.split("/")
         key = data[1] + "|" + data[2] + "|" + file
-        #print(key)
+        
+        #Para Windows
+        #key = data[1].replace('\\', '|') + "|" + file
+        
         with open(filename, "rb") as fr:
           content = fr.read().decode("UTF-8")
 		  #Remover caso não seja testada a letra
@@ -156,6 +159,25 @@ def generate_ground_truth():
         pickle.dump((count_true, matches), file_out)
   print("------------------------------------------------------")
  
+def EvaluateNumberOfInstrumentalLyrics (path_dataset):
+  n_count = 0;
+  
+  for r,d,f in os.walk(path_dataset):
+    for file in f:
+      pathf = r.replace('\\','/')
+      filename = pathf + '/' + file
+      data = r.split("/")
+      key = data[1].replace('\\', '|') + "|" + file
+      
+      with open(filename, "rb") as fr:
+        content = fr.read().decode("UTF-8")
+        content = stextutils.FormatContent(content)
+      
+        split_cont = content.split()
+        if len(split_cont) == 1 and str.lower(split_cont[0]) == str.lower('Instrumental'):
+          n_count = n_count + 1
+  return n_count
+ 
 #verificar se é instrumental
 
 
@@ -175,7 +197,8 @@ def generate_ground_truth():
 #print(is_same_string(c1, c2, 47) == True)
 #s, _ = is_same_string(c1, c2, 47)
 #print(s == True)
- 
+
+#print(EvaluateNumberOfInstrumentalLyrics(path))
 generate_ground_truth()
     
     

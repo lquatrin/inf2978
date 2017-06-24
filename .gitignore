@@ -227,3 +227,5 @@ cpp/pre_matrix_distance.txt
 *.pkl
 t2/data/*.csv
 t2/*.csv
+
+t2/TRAIN_DATASET2
