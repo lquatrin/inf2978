@@ -3,6 +3,7 @@ import re, time, sys, os
 import editdistance
 import pickle
 import itertools
+import stextutils
 
 root = ""
 path = os.path.join(root, "TRAIN_DATASET/")
@@ -70,7 +71,14 @@ def check_match(key1, key2):
         # Checks whether lyrics name is the same
         is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
         if not is_same_lyrics_name and not is_same_lyrics_from_repo:
-            same_lyrics, _ = is_same_string(key1[1],key2[1],5)
+            #Verificar se a letra é igual
+            split_content_1 = key1[1].split()
+            split_content_2 = key2[1].split()
+			
+            if (len(split_content_1) == 1 and str.lower(split_content_1) == str.lower('Instrumental')) or (len(split_content_2) == 1 and str.lower(split_content_2) == str.lower('Instrumental')):
+              return False
+
+            same_lyrics, _ = is_same_string(key1[1], key2[1], 50)
             if same_lyrics :
                return True     
             else:
@@ -105,7 +113,7 @@ def generate_matches(lyrics_tuple_list):
     return match_count, match_set
 
 def generate_ground_truth():
-  
+ 
   pickle_ground_truth_output = "ground_truth_seq_total.p"
   tuples = []
   n_count = 0;
@@ -118,6 +126,9 @@ def generate_ground_truth():
         #print(key)
         with open(filename, "rb") as fr:
           content = fr.read().decode("UTF-8")
+		  #Remover caso não seja testada a letra
+          content = stextutils.FormatContent(content)
+		  
         t = (key,content)
         tuples.append(t)
         n_count = n_count + 1
@@ -146,8 +157,7 @@ def generate_ground_truth():
   print("------------------------------------------------------")
  
 #verificar se é instrumental
-#l = a.split()
-#if len(l) == 1  and str.lower(l[0]) == str.lower('Instrumental')
+
 
 #root = "F:/TRAIN_DATASET/"
 #f1 = root + "vagalume/aaron-carter/forever-for-you-love"
