@@ -70,7 +70,7 @@ def check_match(key1, key2):
         # Checks whether lyrics name is the same
         is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
         if not is_same_lyrics_name and not is_same_lyrics_from_repo:
-            same_lyrics = is_same_string(key1[1],key2[1],5)
+            same_lyrics, _ = is_same_string(key1[1],key2[1],5)
             if same_lyrics :
                return True     
             else:
@@ -144,8 +144,25 @@ def generate_ground_truth():
   with open(pickle_ground_truth_output, "wb") as file_out:
         pickle.dump((count_true, matches), file_out)
   print("------------------------------------------------------")
-  
-  
+ 
+
+#root = "F:/TRAIN_DATASET/"
+#f1 = root + "vagalume/aaron-carter/forever-for-you-love"
+#c1 = None
+#with open(f1, "rb") as fr:
+#  c1 = fr.read().decode("UTF-8")
+#  c1 = sutils.FormatContent(c1)
+#
+#f2 = root + "vagalume/aaron-carter/ill-wait"
+#c2 = None
+#with open(f2, "rb") as fr:
+#  c2 = fr.read().decode("UTF-8")
+#  c2 = sutils.FormatContent(c2)
+# 
+#print(is_same_string(c1, c2, 47) == True)
+#s, _ = is_same_string(c1, c2, 47)
+#print(s == True)
+ 
 generate_ground_truth()
     
     
