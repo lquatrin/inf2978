@@ -154,13 +154,13 @@ def generate_ground_truth():
 #c1 = None
 #with open(f1, "rb") as fr:
 #  c1 = fr.read().decode("UTF-8")
-#  c1 = sutils.FormatContent(c1)
+#  c1 = stextutils.FormatContent(c1)
 #
 #f2 = root + "vagalume/aaron-carter/ill-wait"
 #c2 = None
 #with open(f2, "rb") as fr:
 #  c2 = fr.read().decode("UTF-8")
-#  c2 = sutils.FormatContent(c2)
+#  c2 = stextutils.FormatContent(c2)
 # 
 #print(is_same_string(c1, c2, 47) == True)
 #s, _ = is_same_string(c1, c2, 47)

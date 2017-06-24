@@ -2,7 +2,7 @@ import sys, os, time
 
 from datasketch import MinHash, MinHashLSH
 
-import sutils
+import stextutils
 import serialization
 import numpy as np
 
@@ -14,7 +14,7 @@ def CreateShingle(finput, ngram_size):
     if len(content) == 0:
       return None
     
-    tokens = sutils.FormatContent(content)
+    tokens = stextutils.FormatContent(content)
 
   if ngram_size > len(tokens):
       return set(''.join(tokens))
