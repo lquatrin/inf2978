@@ -15,4 +15,4 @@ rows = int(sys.argv[3])
 bands = int(sys.argv[4])
 similarity_threshold = float(sys.argv[5])
 
-lsh_test.LSHTest(path, shingle_gram, number_of_signatures, rows, bands, similarity_threshold)
+lsh_test.LSHTest(path, shingle_gram, number_of_signatures, similarity_threshold, rows = rows, bands = bands)

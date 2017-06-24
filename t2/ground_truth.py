@@ -145,6 +145,9 @@ def generate_ground_truth():
         pickle.dump((count_true, matches), file_out)
   print("------------------------------------------------------")
  
+#verificar se é instrumental
+#l = a.split()
+#if len(l) == 1  and str.lower(l[0]) == str.lower('Instrumental')
 
 #root = "F:/TRAIN_DATASET/"
 #f1 = root + "vagalume/aaron-carter/forever-for-you-love"

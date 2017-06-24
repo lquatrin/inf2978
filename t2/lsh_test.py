@@ -24,7 +24,7 @@ from datasketch import MinHash, MinHashLSH
 #######################
 # Parametros
 #######################
-def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_threshold):
+def LSHTest (path, shingle_gram, hash_of_signatures, similarity_threshold, rows = None, bands = None):
   assert(rows*bands == hash_of_signatures)	
 
   #print("starting")
@@ -45,7 +45,11 @@ def LSHTest (path, shingle_gram, hash_of_signatures, rows, bands, similarity_thr
   
   # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
   # Create LSH
-  lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
+  lsh = None
+  if (rows is None) or (bands is None):
+    lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands) 
+  else:
+    lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
   for k,v in d_songdata['minhash'].items():
     lsh.insert(k, v)
   

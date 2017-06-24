@@ -31,4 +31,4 @@ for s_gram in shingle_gram:
  
       # each threshold
       for s_threshold in similarity_threshold:
-        lsh_test.LSHTest(path, s_gram, hash_sig, rows, bands, s_threshold)
+        lsh_test.LSHTest(path, s_gram, hash_sig, s_threshold, rows = rows, bands = bands)
