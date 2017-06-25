@@ -67,6 +67,9 @@ def check_match(key1, key2):
 
        # Checks whether lyrics name is the same
        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
+       #if (is_same_artist_name and is_same_lyrics_name) and not is_same_lyrics_from_repo):
+       #  return True
+	   
        if (not is_same_artist_name or not is_same_lyrics_name or not is_same_lyrics_from_repo):
             #Verificar se a letra é igual
             split_content_1 = key1[1].split()
