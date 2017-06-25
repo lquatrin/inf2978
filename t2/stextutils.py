@@ -19,9 +19,12 @@ def FormatContent(content, manual_mode = False):
   content = re.sub("[ôóòõ]", 'o', content)
   # û ú ù
   content = re.sub("[ûúù]" , 'u', content)
+  # ñ
+  content = re.sub("[ñ]" , 'n', content)
   
   # ? ! ' . - " … : ; , [ ] ( ) { }
-  content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}]", ' ', content)
+  content = re.sub("[\\?\\!\\'\\.\\-\"…:;,\\[\\]\\(\\)\\{\\}/\/]", ' ', content)
+  content = re.sub("[\?\!\'\.\-\[\]\(\)\{\}'\']", ' ', content)
   
   # 1 2 3 4 5 6 7 8 9 0
   #content = re.sub("[1234567890]", ' ', content)
