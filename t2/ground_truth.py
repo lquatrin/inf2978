@@ -59,18 +59,15 @@ def check_match(key1, key2):
 
     try:
         # Checks whether artist name is the same
-        is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 3)
-        if not is_same_artist_name:
-            return False
+       is_same_artist_name, _ = is_same_string(key1_split[1], key2_split[1], 3)
+       is_same_lyrics_from_repo = is_same_string_from_repo(key1_split[0],
+                                                                   key2_split[0],
+                                                                   key1_split[2],
+                                                                   key2_split[2])
 
-        is_same_lyrics_from_repo = is_same_string_from_repo(key1_split[0],
-                                                                    key2_split[0],
-                                                                    key1_split[2],
-                                                                    key2_split[2])
-
-        # Checks whether lyrics name is the same
-        is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
-        if not is_same_lyrics_name and not is_same_lyrics_from_repo:
+       # Checks whether lyrics name is the same
+       is_same_lyrics_name, _ = is_same_string(key1_split[2], key2_split[2], 3)
+       if (not is_same_artist_name or not is_same_lyrics_name or not is_same_lyrics_from_repo):
             #Verificar se a letra é igual
             split_content_1 = key1[1].split()
             split_content_2 = key2[1].split()
@@ -85,7 +82,7 @@ def check_match(key1, key2):
                return False
 
     except Exception:
-        print("Error comparing '%s' and '%s'. Returning False for matching." % (key1, key2))
+        #print("Error comparing '%s' and '%s'. Returning False for matching." % (key1, key2))
         return False
 
     return True
