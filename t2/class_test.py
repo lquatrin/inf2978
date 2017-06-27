@@ -29,15 +29,13 @@ lsh_time = time.clock()
   
 # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
 # Create LSH
-lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
+if rows == None or bands == None:
+  lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands)
+else:
+  lsh = MinHashLSH(threshold = similarity_threshold, num_perm = rows*bands, params = (rows, bands))
 for k,v in d_songdata['minhash'].items():
   lsh.insert(k, v)
   
-#precision, recall = sutils.evalutation(lsh)
-#print(". Precision: {}".format(precision))
-#print(". Recall: {}".format(recall))
-#ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '_' + str(precision) + '_' + str(recall) + '.csv','w')
- 
 ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '.csv','w')
   
 # Checar letras parecidas baseado no valor de 'similarity_threshold'
@@ -62,7 +60,6 @@ for key, v_minhash in d_songdata['minhash'].items():
               ret_file.write(str(s_ret) + ';' + str(key))
             ret_file.write('\n')
 
-# Criando o arquivo csv
 lsh_time = time.clock() - lsh_time
 
 print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
