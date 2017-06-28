@@ -1,5 +1,4 @@
-import sys, os, time, sutils
-import serialization
+import sys, os, time
 import shingle
 from datasketch import MinHash, MinHashLSH 
 
@@ -16,6 +15,8 @@ bands = 20
 similarity_threshold = 0.9
 
 assert(rows*bands == hash_of_signatures)	
+
+print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
 
 ######################################
 # MinHash
@@ -39,21 +40,16 @@ for k,v in d_songdata['minhash'].items():
 ret_file = open('data/' + 'resfile_' + str(shingle_gram) + '_' + str(hash_of_signatures) + '_' + str(rows) + '_' + str(bands) + '_' + str(similarity_threshold).replace('.','') + '.csv','w')
   
 # Checar letras parecidas baseado no valor de 'similarity_threshold'
-g_sel = 0
-g_total = 0
 added_songs = dict()
-
 for key, v_minhash in d_songdata['minhash'].items():
   result = lsh.query(v_minhash)
 
   if len(result) > 1:
     for s_ret in result:
       if s_ret is not key:
-        if not (((key,s_ret) in added_songs) or ((s_ret,key) in added_songs)):
-          g_total = g_total + 1
+        if not (((key, s_ret) in added_songs) or ((s_ret, key) in added_songs)):
           added_songs[(key, s_ret)] = True
           if v_minhash.jaccard(d_songdata['minhash'][s_ret]) >= similarity_threshold:
-            g_sel = g_sel + 1
             if key < s_ret:
               ret_file.write(str(key) + ';' + str(s_ret))
             else:
@@ -62,9 +58,7 @@ for key, v_minhash in d_songdata['minhash'].items():
 
 lsh_time = time.clock() - lsh_time
 
-print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
 print(". Time: " + str(lsh_time))
-print(". LSH Precision: " + str((g_sel / g_total) * 100) + " %" + " [" + str(g_total) + ", " + str(g_sel) + "]")
 
 ret_file.close()
 ######################################
