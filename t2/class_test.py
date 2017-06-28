@@ -8,10 +8,10 @@ path = str(sys.argv[1])
 #######################
 # Parametros [a ser definido apos testes]
 #######################
-shingle_gram = 4
-hash_of_signatures = 100
-rows = 5
-bands = 20
+shingle_gram = 8
+hash_of_signatures = 256
+rows = 16
+bands = 16
 similarity_threshold = 0.9
 
 assert(rows*bands == hash_of_signatures)	
