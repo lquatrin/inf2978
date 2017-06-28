@@ -17,16 +17,15 @@ similarity_threshold = 0.9
 assert(rows*bands == hash_of_signatures)	
 
 print("LSH [" + str(shingle_gram) + ", " + str(hash_of_signatures) + ", " + str(rows) + ", " + str(bands) + ", " + str(similarity_threshold) + "]")
+lsh_time = time.clock()
 
 ######################################
 # MinHash
 d_songdata = shingle.ClassShingleAndBuildMinHash(path, shingle_gram, hash_of_signatures)
-print(str(shingle_gram) + '_' + str(hash_of_signatures) + ": " + str(d_songdata['time']))
 ######################################
 
 ######################################
 # LSH
-lsh_time = time.clock()
   
 # Define "weights = (r*b / r, r*b / b)" or "params = (r, b)"
 # Create LSH
